@@ -10,7 +10,9 @@
   },
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon index.js"
+    "server": "nodemon index.js",
+    "migrate:up": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +32,9 @@
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.31.0",
-    "uuid": "^9.0.0"
+    "sequelize-cli": "^6.6.0",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
