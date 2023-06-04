@@ -1,24 +1,47 @@
-const jwt = require("jsonwebtoken");
+const TokenService = require('../service/TokenService');
+const ApiError = require("../error/ApiError");
 
 module.exports = function(role) {
   return function (req, res, next) {
     if (req.method === "OPTIONS") {
       next()
     }
+
     try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.includes("Bearer ")) {
+        return next(
+            ApiError.unauthorized("Не авторизован", [
+              {
+                name: "checkRoleMiddleware",
+                description: "Отсутствуют заголовки",
+              },
+            ])
+        );
+      }
+
       const token = req.headers.authorization.split(' ').at(1)
       if (!token) {
-        return res.status(401).json({message: "Не авторизован."})
+        return next(ApiError.unauthorized('Не авторизован', [
+          {
+            name: 'checkRoleMiddleware',
+            description: 'Необходимо авторизоваться',
+          },
+        ]));
       }
-      const decoded = jwt.verify(token, process.env.SECRET_KEY)
+      const decoded = TokenService.validateAccessToken(token);
       if (decoded.role !== role) {
-        return res.status(403).json({message: "Нет доступа."})
+        return next(ApiError.badRequest('Нет доступа', [
+          {
+            name: 'checkRoleMiddleware',
+            description: 'Нет доступа',
+          },
+        ]));
       }
-      req.user = decoded
+      req.user = decoded;
       next()
     } catch (e) {
-      res.status(401).json({message: "Не авторизован."})
+      return next(e)
     }
   };
 }
-

@@ -2,9 +2,12 @@ const Router = require('express');
 const router = new Router();
 const promoCodeController = require('../controllers/PromoCodeController');
 const checkRoleMiddleware = require('../middleware/checkRoleMiddleware');
-const authMiddleware = require("../middleware/authMiddleware");
 
-router.post('/create', promoCodeController.create);
-router.get('/get', promoCodeController.getAll);
+router.post('/create', checkRoleMiddleware('ADMIN'), promoCodeController.create);
+router.get('/get', checkRoleMiddleware('ADMIN'), promoCodeController.getAll);
+router.post('/delete', checkRoleMiddleware('ADMIN'), promoCodeController.delete);
+router.put('/change', checkRoleMiddleware('ADMIN'), promoCodeController.change);
+router.post('/use', promoCodeController.use);
+router.post('/check', promoCodeController.check);
 
 module.exports = router;

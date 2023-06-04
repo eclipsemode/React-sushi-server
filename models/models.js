@@ -27,21 +27,31 @@ const Token = sequelize.define("token", {
 });
 
 const Promocode = sequelize.define("promocode", {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    code: {type: DataTypes.STRING, allowNull: false, unique: true},
-    type: {type: DataTypes.STRING, defaultValue: 'RUB'},
-    discount: {type: DataTypes.INTEGER, allowNull: false},
-    limit: {type: DataTypes.STRING, defaultValue: 'infinite'}
-}, {
-    timestamps: true
-})
+        id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+        code: {type: DataTypes.STRING, allowNull: false, unique: true},
+        type: {type: DataTypes.ENUM('RUB', 'percent')},
+        discount: {type: DataTypes.INTEGER, allowNull: false},
+        limit: {
+            type: DataTypes.STRING, defaultValue: 'infinite', validate: {
+                isInfinityOrNumber: function (val) {
+                    if (val !== 'infinite' && !Number.isInteger(Number(val))) {
+                        throw new Error('Number must be "infinite" or an integer.');
+                    }
+                }
+            }
+        }
+    },
+    {
+        timestamps: true
+    }
+)
 
 const Order = sequelize.define("order", {
         id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
         orderProducts: {type: DataTypes.ARRAY(DataTypes.JSONB), allowNull: false},
         totalPrice: {type: DataTypes.INTEGER, allowNull: false},
         totalAmount: {type: DataTypes.INTEGER, allowNull: false},
-        type: {type: DataTypes.STRING, allowNull: false},
+        type: {type: DataTypes.ENUM('delivery', 'pickup'), allowNull: false},
         name: {type: DataTypes.STRING, allowNull: false},
         address: {type: DataTypes.STRING},
         entrance: {type: DataTypes.INTEGER},
@@ -53,7 +63,8 @@ const Order = sequelize.define("order", {
         time: {type: DataTypes.STRING},
         utensils: {type: DataTypes.INTEGER, allowNull: false},
         payment: {type: DataTypes.STRING, allowNull: false},
-        commentary: {type: DataTypes.TEXT}
+        commentary: {type: DataTypes.TEXT},
+        promocode: {type: DataTypes.STRING, allowNull: true}
     },
     {
         timestamps: true

@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken')
 const ApiError = require('../error/ApiError');
 const TokenService = require('../service/TokenService');
 
@@ -18,6 +17,6 @@ module.exports = function (req, res, next) {
     req.user = tokenData
     next();
   } catch (e) {
-    return next(ApiError.unauthorized());
+    return next(e);
   }
 };

@@ -1,9 +1,22 @@
-const { User, Order, Product } = require('../models/models');
+const { User, Order, Product, Promocode } = require('../models/models');
 const ApiError = require("../error/ApiError");
+const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
   async create(data) {
-    const order = await Order.create({...data})
+    let order;
+    const promoCode = await PromoCodeService.check(data.promocode)
+
+    if (!promoCode) {
+        order = await Order.create({
+          ...data,
+          promocode: null
+        })
+    } else {
+      await PromoCodeService.use(data.promocode);
+      order = await Order.create(data)
+    }
+
     return order;
   }
 
