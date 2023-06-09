@@ -176,7 +176,12 @@ class PromoCodeService {
 
     async check(code) {
         if (!code) {
-            return false;
+            throw ApiError.internal('Промокод отсутствует', [
+                {
+                    name: 'check',
+                    description: 'Введите промокод'
+                }
+            ])
         }
 
         const foundCode =  await Promocode.findOne({
@@ -186,7 +191,12 @@ class PromoCodeService {
         });
 
         if (!foundCode) {
-            return false
+            throw ApiError.internal('Промокод не найден', [
+                {
+                    name: 'check',
+                    description: 'Введите правильный промокод'
+                }
+            ])
         }
 
         if (+foundCode.limit < 1) {
