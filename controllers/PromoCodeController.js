@@ -52,7 +52,7 @@ class PromoCodeController {
     async check(req, res, next) {
         try {
             const promoCode = await PromoCodeService.check(req.body.code)
-            return res.status(200).json({promoCode});
+            return res.status(200).json(promoCode);
         } catch (error) {
             next(error)
         }

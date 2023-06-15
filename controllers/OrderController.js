@@ -7,8 +7,8 @@ class OrderController {
       const data = req.body;
       const order = await OrderService.create(data);
       return res.json(order);
-    } catch (e) {
-      next(ApiError.badRequest(e.message))
+    } catch (error) {
+      next(error)
     }
   }
 

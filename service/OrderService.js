@@ -1,34 +1,112 @@
-const { User, Order, Product, Promocode } = require('../models/models');
+const {User, Order, Product, Promocode} = require('../models/models');
 const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
-  async create(data) {
-    let order;
-    const promoCode = await PromoCodeService.check(data.promocode)
+    async create(data) {
+        let order;
 
-    if (!promoCode) {
-        order = await Order.create({
-          ...data,
-          promocode: null
+        if (!data.orderProducts) {
+            throw ApiError.badRequest('Отсутствуют товары', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.totalPrice) {
+            throw ApiError.badRequest('Отсутствует итоговая стоимость', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.totalAmount) {
+            throw ApiError.badRequest('Отсутствует общее количество товаров', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.type) {
+            throw ApiError.badRequest('Отсутствует тип заказа', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.name) {
+            throw ApiError.badRequest('Отсутствует имя', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.tel) {
+            throw ApiError.badRequest('Отсутствует телефон', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.utensils) {
+            throw ApiError.badRequest('Отсутствует количество приборов', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        } else if (!data.payment) {
+            throw ApiError.badRequest('Отсутствует тип оплаты', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        }
+
+        if (data.payment !== 'cash' && data.payment !== 'card') {
+            throw ApiError.badRequest('Неверный тип оплаты (Тип оплаты может иметь значение "card" или "cash")', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        }
+
+        if (data.type !== 'delivery' && data.type !== 'pickup') {
+            throw ApiError.badRequest('Неверный тип заказа (Тип заказа может иметь значение "delivery" или "pickup")', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        }
+
+        const promoCode = await Promocode.findOne({
+            where: {
+                code: data.promocode
+            }
         })
-    } else {
-      await PromoCodeService.use(data.promocode);
-      order = await Order.create(data)
+
+        if (!promoCode) {
+            order = await Order.create(data);
+        } else {
+            await PromoCodeService.use(data.promocode);
+            order = await Order.create(data);
+        }
+
+        return order;
     }
 
-    return order;
-  }
+    async getAll() {
+        const orders = await Order.findAll()
+        return orders;
+    }
 
-  async getAll() {
-    const orders = await Order.findAll()
-    return orders;
-  }
-
-  async getAllByUserId(id) {
-    const orders = await Order.findAll({where: { userId: id }})
-    return orders;
-  }
+    async getAllByUserId(id) {
+        const orders = await Order.findAll({where: {userId: id}})
+        return orders;
+    }
 }
 
 module.exports = new OrderService();

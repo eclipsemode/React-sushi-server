@@ -6,7 +6,7 @@ const User = sequelize.define("user", {
     email: {type: DataTypes.STRING, unique: true, allowNull: false, validate: {notEmpty: true, isEmail: true}},
     dateOfBirth: {type: DataTypes.DATE},
     password: {type: DataTypes.STRING, allowNull: false},
-    role: {type: DataTypes.STRING, defaultValue: "USER"},
+    role: {type: DataTypes.ENUM('USER', 'ADMIN'), defaultValue: "USER"},
     name: {type: DataTypes.STRING, allowNull: false, validate: {notEmpty: true}},
     surname: {type: DataTypes.STRING},
     tel: {type: DataTypes.STRING, allowNull: false, unique: true},
@@ -62,7 +62,7 @@ const Order = sequelize.define("order", {
         day: {type: DataTypes.STRING},
         time: {type: DataTypes.STRING},
         utensils: {type: DataTypes.INTEGER, allowNull: false},
-        payment: {type: DataTypes.STRING, allowNull: false},
+        payment: {type: DataTypes.ENUM('cash', 'card'), allowNull: false},
         commentary: {type: DataTypes.TEXT},
         promocode: {type: DataTypes.STRING, allowNull: true}
     },
