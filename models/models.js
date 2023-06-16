@@ -61,7 +61,7 @@ const Order = sequelize.define("order", {
         email: {type: DataTypes.STRING},
         day: {type: DataTypes.STRING},
         time: {type: DataTypes.STRING},
-        utensils: {type: DataTypes.INTEGER, allowNull: false},
+        utensils: {type: DataTypes.INTEGER, defaultValue: 0},
         payment: {type: DataTypes.ENUM('cash', 'card'), allowNull: false},
         commentary: {type: DataTypes.TEXT},
         promocode: {type: DataTypes.STRING, allowNull: true}

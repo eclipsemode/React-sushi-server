@@ -48,13 +48,6 @@ class OrderService {
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.utensils) {
-            throw ApiError.badRequest('Отсутствует количество приборов', [
-                {
-                    name: 'create',
-                    description: 'Ошибка создания заказа'
-                }
-            ])
         } else if (!data.payment) {
             throw ApiError.badRequest('Отсутствует тип оплаты', [
                 {
