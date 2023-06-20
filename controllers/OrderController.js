@@ -27,7 +27,17 @@ class OrderController {
       const orders = await OrderService.getAllByUserId(id);
       return res.json(orders);
     } catch (e) {
-      next(ApiError.badRequest('Произошла ошибка.'))
+      next(ApiError.badRequest('Произошла ошибка.'));
+    }
+  }
+
+  async changeStatus(req, res, next) {
+    try {
+      const { id, status } = req.body;
+      const order = await OrderService.changeStatus(id, status);
+      return res.json(order);
+    } catch (e) {
+      next(e);
     }
   }
 }

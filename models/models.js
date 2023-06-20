@@ -11,10 +11,10 @@ const User = sequelize.define("user", {
     surname: {type: DataTypes.STRING},
     tel: {type: DataTypes.STRING, allowNull: false, unique: true},
     street: {type: DataTypes.STRING},
-    house: {type: DataTypes.STRING},
-    floor: {type: DataTypes.STRING, validate: {isNumeric: true}},
-    entrance: {type: DataTypes.STRING, validate: {isNumeric: true}},
-    room: {type: DataTypes.STRING, validate: {isNumeric: true}},
+    house: {type: DataTypes.NUMBER},
+    floor: {type: DataTypes.NUMBER},
+    entrance: {type: DataTypes.NUMBER},
+    room: {type: DataTypes.NUMBER},
     isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
     activationLink: {type: DataTypes.STRING}
 }, {
@@ -64,7 +64,8 @@ const Order = sequelize.define("order", {
         utensils: {type: DataTypes.INTEGER, defaultValue: 0},
         payment: {type: DataTypes.ENUM('cash', 'card'), allowNull: false},
         commentary: {type: DataTypes.TEXT},
-        promocode: {type: DataTypes.STRING, allowNull: true}
+        promocode: {type: DataTypes.STRING, allowNull: true},
+        status: {type: DataTypes.ENUM('new', 'production', 'produced', 'delivery', 'completed', 'deleted'), allowNull: false, defaultValue: 'new'}
     },
     {
         timestamps: true

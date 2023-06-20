@@ -110,6 +110,13 @@ class UserService {
   async getUserData(token) {
     const { userId } = await TokenService.findToken(token);
     const user = await User.findOne({ where: { id: userId } });
+    user.dateOfBirth = !!user.dateOfBirth ? user.dateOfBirth : null;
+    user.surname = !!user.surname ? user.surname : null;
+    user.street = !!user.street ? user.street : null;
+    user.house = !!user.house ? user.house : null;
+    user.floor = !!user.floor ? user.floor : null;
+    user.entrance = !!user.entrance ? user.entrance : null;
+    user.room = !!user.room ? user.room : null;
     return user;
   }
 
