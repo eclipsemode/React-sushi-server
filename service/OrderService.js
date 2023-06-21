@@ -97,8 +97,17 @@ class OrderService {
     }
 
     async getAllByUserId(id) {
-        const orders = await Order.findAll({where: {userId: id}})
-        return orders;
+        const orders = await Order.findAll({where: {userId: id}});
+        const updatedOrders = orders.map(order => {
+            return {
+                ...order.toJSON(),
+                entrance: !!order.entrance ? order.entrance : null,
+                floor: !!order.floor ? order.floor : null,
+                room: !!order.room ? order.room : null,
+                commentary: order.commentary.length > 0 ? order.commentary : null
+            }
+        })
+        return updatedOrders;
     }
 
     async changeStatus(id, status) {
