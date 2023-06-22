@@ -12,7 +12,7 @@ class ProductService {
 
       let fileName = uuid.v4() + ".jpg";
       image.mv(path.resolve(__dirname, "..", "static", fileName));
-      const product = await Product.create({ name, price, description, rating, categoryId, image: fileName });
+      const product = await Product.create({ name, price: JSON.parse(price), description, rating: parseInt(rating), categoryId: parseInt(categoryId), image: fileName });
 
       return product;
   }
