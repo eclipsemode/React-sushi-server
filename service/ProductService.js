@@ -24,7 +24,7 @@ class ProductService {
     return "Deleted successfully";
   }
 
-  async getAll({ categoryId, sortBy, sortOrder }, next) {
+  async getBySort({ categoryId, sortBy, sortOrder }, next) {
       let products;
       if (categoryId) {
         if (!sortBy || !sortOrder) next(ApiError.badRequest("Не указана сортировка."));
@@ -38,6 +38,10 @@ class ProductService {
         products = await Product.findAll();
       }
       return products;
+  }
+
+  async getAll() {
+      return Product.findAll();
   }
 }
 

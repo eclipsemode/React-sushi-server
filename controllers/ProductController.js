@@ -20,13 +20,22 @@ class ProductController {
     }
   }
 
-  async getAll(req, res, next) {
+  async getBySort(req, res, next) {
     try {
       const { sortBy } = req.query;
-      const products = await ProductService.getAll(req.query, next)
+      const products = await ProductService.getBySort(req.query, next)
       return res.json(sortBy === 'rating' ? products.reverse() : products);
     } catch (e) {
-      next(ApiError.badRequest(e.message));
+      next(e);
+    }
+  }
+
+  async getAll(req, res,next) {
+    try {
+      const products = await ProductService.getAll();
+      return res.json(products);
+    } catch (e) {
+      next(e);
     }
   }
 }
