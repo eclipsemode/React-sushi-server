@@ -7,7 +7,7 @@ class ProductController {
       const product = await ProductService.create(req.body, req.files.image, next)
       return res.json(product);
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(error);
     }
   }
 

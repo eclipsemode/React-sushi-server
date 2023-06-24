@@ -4,7 +4,16 @@ const path = require("path");
 const { Product } = require("../models/models");
 
 class ProductService {
-  async create({ name, price, description, categoryId, rating }, image, next) {
+  async create({ name, price, description, categoryId, rating, sku, orderIndex, type }, image, next) {
+
+      if (!!type && type !== 'pizza' && type !== 'other') {
+          throw ApiError.badRequest('Тип может быть "pizza" или "other"', [
+              {
+                  name: 'create',
+                  description: 'Ошибка создания продукта'
+              }
+          ])
+      }
 
       if (+rating > 10 || rating < 1) {
         return next(ApiError.badRequest("Неверные значения рейтинга."));
@@ -12,7 +21,7 @@ class ProductService {
 
       let fileName = uuid.v4() + ".jpg";
       image.mv(path.resolve(__dirname, "..", "static", fileName));
-      const product = await Product.create({ name, price: JSON.parse(price), description, rating: parseInt(rating), categoryId: parseInt(categoryId), image: fileName });
+      const product = await Product.create({ name, price: JSON.parse(price), description, rating: parseInt(rating), categoryId: parseInt(categoryId), image: fileName, sku: JSON.parse(sku), orderIndex: parseInt(orderIndex), type });
 
       return product;
   }
