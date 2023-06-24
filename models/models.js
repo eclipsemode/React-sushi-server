@@ -73,12 +73,12 @@ const Order = sequelize.define("order", {
 
 const Product = sequelize.define("product", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, unique: true, allowNull: false},
-    price: {type: DataTypes.ARRAY(DataTypes.INTEGER), allowNull: false},
+    name: {type: DataTypes.STRING, allowNull: false, unique: false},
+    price: {type: DataTypes.INTEGER, allowNull: false},
     rating: {type: DataTypes.INTEGER, defaultValue: 1},
     description: {type: DataTypes.STRING, allowNull: false},
     image: {type: DataTypes.STRING, allowNull: false},
-    sku: {type: DataTypes.ARRAY(DataTypes.STRING), defaultValue: null},
+    sku: {type: DataTypes.STRING, defaultValue: null},
     orderIndex: {type: DataTypes.INTEGER, defaultValue: null},
     type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'}
 });

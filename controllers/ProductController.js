@@ -1,4 +1,3 @@
-const ApiError = require("../error/ApiError");
 const ProductService = require('../service/ProductService');
 
 class ProductController {
@@ -14,9 +13,18 @@ class ProductController {
   async delete(req, res, next) {
     try {
       const result = await ProductService.delete(req.params.id)
-      return res.status(200).json( result);
+      return res.status(200).json(result);
     } catch (error) {
-      next(ApiError.badRequest(error.message));
+      next(error);
+    }
+  }
+
+  async deleteAllPizzaSize(req, res, next) {
+    try {
+      const result = await ProductService.deleteAllPizzaSize(req.params.id);
+      return res.status(200).json(result)
+    } catch (e) {
+      next(e);
     }
   }
 
