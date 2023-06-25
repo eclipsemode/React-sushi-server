@@ -80,7 +80,8 @@ const Product = sequelize.define("product", {
     image: {type: DataTypes.STRING, allowNull: false},
     sku: {type: DataTypes.STRING, defaultValue: null},
     orderIndex: {type: DataTypes.INTEGER, defaultValue: null},
-    type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'}
+    type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'},
+    size: {type: DataTypes.STRING}
 });
 
 const Category = sequelize.define("category", {

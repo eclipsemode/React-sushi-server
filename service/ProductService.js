@@ -31,7 +31,7 @@ class ProductService {
             const sizeArr = !!size ? JSON.parse(size) : [];
 
             let fileName = uuid.v4() + ".jpg";
-            image.mv(path.resolve(__dirname, "..", "static", fileName));
+            await image.mv(path.resolve(__dirname, "..", "static", fileName));
 
             const productPromises = priceArr.map(async (item, i) => {
                 const newProduct = await Product.create({
@@ -54,7 +54,7 @@ class ProductService {
             return product
         } else {
             let fileName = uuid.v4() + ".jpg";
-            image.mv(path.resolve(__dirname, "..", "static", fileName));
+            await image.mv(path.resolve(__dirname, "..", "static", fileName));
             const product = await Product.create({
                 name,
                 price: JSON.parse(price),
