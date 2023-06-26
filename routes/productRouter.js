@@ -4,9 +4,8 @@ const productController = require('../controllers/ProductController');
 const checkRoleMiddleware = require('../middleware/checkRoleMiddleware');
 
 router.post('/', checkRoleMiddleware('ADMIN'), productController.create);
-router.get('/', productController.getBySort);
+router.get('/', productController.getAll);
 router.delete('/:id', checkRoleMiddleware('ADMIN'), productController.delete);
-router.delete('/all/:id', checkRoleMiddleware('ADMIN'), productController.deleteAllPizzaSize);
-router.get('/get-all', productController.getAll);
+router.put('/', checkRoleMiddleware('ADMIN'), productController.change);
 
 module.exports = router;

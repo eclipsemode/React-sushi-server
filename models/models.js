@@ -74,15 +74,19 @@ const Order = sequelize.define("order", {
 const Product = sequelize.define("product", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false, unique: false},
-    price: {type: DataTypes.INTEGER, allowNull: false},
     rating: {type: DataTypes.INTEGER, defaultValue: 1},
     description: {type: DataTypes.STRING, allowNull: false},
     image: {type: DataTypes.STRING, allowNull: false},
-    sku: {type: DataTypes.STRING, defaultValue: null},
     orderIndex: {type: DataTypes.INTEGER, defaultValue: null},
     type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'},
-    size: {type: DataTypes.STRING}
 });
+
+const ProductSize = sequelize.define("productSize", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    size: {type: DataTypes.STRING},
+    price: {type: DataTypes.INTEGER, allowNull: false},
+    sku: {type: DataTypes.STRING, defaultValue: null},
+})
 
 const Category = sequelize.define("category", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -113,11 +117,20 @@ Product.belongsTo(Category, {
     }
 });
 
+Product.hasMany(ProductSize, { as: 'sizes'} );
+ProductSize.belongsTo(Product, {
+    foreignKey: {
+        name: 'productId',
+        allowNull: false
+    }
+});
+
 module.exports = {
     User,
     Order,
     Product,
     Category,
     Token,
-    Promocode
+    Promocode,
+    ProductSize
 };
