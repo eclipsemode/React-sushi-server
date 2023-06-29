@@ -48,7 +48,6 @@ const Promocode = sequelize.define("promocode", {
 
 const Order = sequelize.define("order", {
         id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        orderProducts: {type: DataTypes.ARRAY(DataTypes.JSONB), allowNull: false},
         totalPrice: {type: DataTypes.INTEGER, allowNull: false},
         totalAmount: {type: DataTypes.INTEGER, allowNull: false},
         type: {type: DataTypes.ENUM('delivery', 'pickup'), allowNull: false},
@@ -70,6 +69,24 @@ const Order = sequelize.define("order", {
     {
         timestamps: true
     });
+
+const OrderProduct = sequelize.define("orderProduct", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    productId: {type: DataTypes.INTEGER, allowNull: false},
+    name: {type: DataTypes.STRING, allowNull: false, unique: false},
+    rating: {type: DataTypes.INTEGER, defaultValue: 1},
+    description: {type: DataTypes.STRING, allowNull: false},
+    image: {type: DataTypes.STRING, allowNull: false},
+    orderIndex: {type: DataTypes.INTEGER, defaultValue: null},
+    type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'},
+    sizeId: {type: DataTypes.INTEGER, allowNull: false},
+    size: {type: DataTypes.STRING},
+    price: {type: DataTypes.INTEGER, allowNull: false},
+    sku: {type: DataTypes.STRING, defaultValue: null},
+    amount: {type: DataTypes.INTEGER, allowNull: false, defaultValue : 1}
+},{
+    timestamps: true
+})
 
 const Product = sequelize.define("product", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -109,6 +126,14 @@ Order.belongsTo(User, {
     }
 })
 
+Order.hasMany(OrderProduct, { as: 'products' });
+OrderProduct.belongsTo(Order, {
+    foreignKey: {
+        name: 'orderId',
+        allowNull: false
+    }
+})
+
 Category.hasMany(Product);
 Product.belongsTo(Category, {
     foreignKey: {
@@ -128,6 +153,7 @@ ProductSize.belongsTo(Product, {
 module.exports = {
     User,
     Order,
+    OrderProduct,
     Product,
     Category,
     Token,

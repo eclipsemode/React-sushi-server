@@ -1,54 +1,56 @@
-const {User, Order, Product, Promocode} = require('../models/models');
+const { Order, Product, Promocode, OrderProduct} = require('../models/models');
 const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
-    async create(data) {
-        let order;
+    async create(totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
 
-        if (!data.orderProducts) {
+        let order;
+        let orderProducts = [];
+
+        if (products.length === 0) {
             throw ApiError.badRequest('Отсутствуют товары', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.totalPrice) {
+        } else if (!totalPrice) {
             throw ApiError.badRequest('Отсутствует итоговая стоимость', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.totalAmount) {
+        } else if (!totalAmount) {
             throw ApiError.badRequest('Отсутствует общее количество товаров', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.type) {
+        } else if (!type) {
             throw ApiError.badRequest('Отсутствует тип заказа', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.name) {
+        } else if (!name) {
             throw ApiError.badRequest('Отсутствует имя', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.tel) {
+        } else if (!tel) {
             throw ApiError.badRequest('Отсутствует телефон', [
                 {
                     name: 'create',
                     description: 'Ошибка создания заказа'
                 }
             ])
-        } else if (!data.payment) {
+        } else if (!payment) {
             throw ApiError.badRequest('Отсутствует тип оплаты', [
                 {
                     name: 'create',
@@ -57,7 +59,7 @@ class OrderService {
             ])
         }
 
-        if (data.payment !== 'cash' && data.payment !== 'card') {
+        if (payment !== 'cash' && payment !== 'card') {
             throw ApiError.badRequest('Неверный тип оплаты (Тип оплаты может иметь значение "card" или "cash")', [
                 {
                     name: 'create',
@@ -66,7 +68,7 @@ class OrderService {
             ])
         }
 
-        if (data.type !== 'delivery' && data.type !== 'pickup') {
+        if (type !== 'delivery' && type !== 'pickup') {
             throw ApiError.badRequest('Неверный тип заказа (Тип заказа может иметь значение "delivery" или "pickup")', [
                 {
                     name: 'create',
@@ -75,39 +77,58 @@ class OrderService {
             ])
         }
 
-        const promoCode = await Promocode.findOne({
+        const foundPromoCode = await Promocode.findOne({
             where: {
-                code: data.promocode
+                code: promocode
             }
         })
 
-        if (!promoCode) {
-            order = await Order.create(data);
+        if (!foundPromoCode) {
+            order = await Order.create({totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            const productsPromises = products.map(async (item) => {
+                return await OrderProduct.create({
+                    ...item,
+                    orderId: order.id
+                });
+            })
+
+            orderProducts = await Promise.all(productsPromises);
+
         } else {
-            await PromoCodeService.use(data.promocode);
-            order = await Order.create(data);
+            await PromoCodeService.use(promocode);
+            order = await Order.create({totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+
+            const productsPromises = products.map(async (item) => {
+                return await OrderProduct.create({
+                    ...item,
+                    orderId: order.id
+                });
+            })
+
+            orderProducts = await Promise.all(productsPromises);
         }
 
-        return order;
+        return {
+            ...order.dataValues,
+            orderProducts
+        };
     }
 
     async getAll() {
-        const orders = await Order.findAll()
+        const orders = await Order.findAll({
+            include: [{ model: OrderProduct, as: 'products' }]
+        })
         return orders;
     }
 
     async getAllByUserId(id) {
-        const orders = await Order.findAll({where: {userId: id}});
-        const updatedOrders = orders.map(order => {
-            return {
-                ...order.toJSON(),
-                entrance: !!order.entrance ? order.entrance : null,
-                floor: !!order.floor ? order.floor : null,
-                room: !!order.room ? order.room : null,
-                commentary: order.commentary.length > 0 ? order.commentary : null
-            }
-        })
-        return updatedOrders;
+        const orders = await Order.findAll({
+            where: {
+                userId: id
+            },
+            include: [{ model: OrderProduct, as: 'products' }]
+        });
+        return orders;
     }
 
     async changeStatus(id, status) {

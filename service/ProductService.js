@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const uuid = require("uuid");
 const path = require("path");
 const {Product, ProductSize} = require("../models/models");
+const {DataTypes} = require("sequelize");
 
 class ProductService {
     async create({name, price, description, categoryId, rating, sku, orderIndex, type, size}, image) {
@@ -33,7 +34,8 @@ class ProductService {
             description,
             image: fileName,
             orderIndex,
-            type
+            type,
+            categoryId
         })
 
         const parsedSize = JSON.parse(size);
@@ -103,7 +105,25 @@ class ProductService {
             });
         }
 
-        return products;
+        const parsedData = products.reduce((previousValue, currentValue, currentIndex, array) => {
+            return [...previousValue, currentValue.sizes.map(item => {
+                return {
+                    id: currentValue.id,
+                    name: currentValue.name,
+                    rating: currentValue.rating,
+                    description: currentValue.description,
+                    image: currentValue.image,
+                    orderIndex: currentValue.orderIndex,
+                    type: currentValue.type,
+                    sizeId: item.id,
+                    size: item.size,
+                    price: item.price,
+                    sku: item.sku,
+                }
+            })]
+        }, [])
+
+        return parsedData;
     }
 
     async change(id, name, price, description, categoryId, rating, sku, orderIndex, type, size, image) {
