@@ -3,7 +3,7 @@ const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
-    async create(totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
+    async create(userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
 
         let order;
         let orderProducts = [];
@@ -84,7 +84,7 @@ class OrderService {
         })
 
         if (!foundPromoCode) {
-            order = await Order.create({totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            order = await Order.create({userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
             const productsPromises = products.map(async (item) => {
                 return await OrderProduct.create({
                     ...item,
@@ -96,7 +96,7 @@ class OrderService {
 
         } else {
             await PromoCodeService.use(promocode);
-            order = await Order.create({totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            order = await Order.create({userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
 
             const productsPromises = products.map(async (item) => {
                 return await OrderProduct.create({

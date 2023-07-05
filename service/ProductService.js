@@ -3,7 +3,6 @@ const fs = require('fs-extra');
 const uuid = require("uuid");
 const path = require("path");
 const {Product, ProductSize} = require("../models/models");
-const {DataTypes} = require("sequelize");
 
 class ProductService {
     async create({name, price, description, categoryId, rating, sku, orderIndex, type, size}, image) {
@@ -26,6 +25,7 @@ class ProductService {
             ])
         }
 
+        const products = await Product.findAll();
         let fileName = uuid.v4() + ".jpg";
         await image.mv(path.resolve(__dirname, "..", "static", fileName));
         const product = await Product.create({
@@ -33,21 +33,22 @@ class ProductService {
             rating,
             description,
             image: fileName,
-            orderIndex,
+            orderIndex: orderIndex ?? products.length + 1,
             type,
             categoryId
         })
 
-        const parsedSize = JSON.parse(size);
+
+        const parsedSize = size ? JSON.parse(size) : null;
         const parsedPrice = JSON.parse(price);
-        const parsedSku = JSON.parse(sku);
+        const parsedSku = sku ? JSON.parse(sku) : null;
 
 
-        const sizePromises = parsedSize.map(async (_, index) => {
+        const sizePromises = parsedPrice.map(async (_, index) => {
             return await ProductSize.create({
-                size: parsedSize[index],
+                size: parsedSize ? parsedSize[index] : null,
                 price: parsedPrice[index],
-                sku: parsedSku[index],
+                sku: parsedSku ? parsedSku[index] : null,
                 productId: product.id
             })
         })
@@ -112,6 +113,7 @@ class ProductService {
                     name: currentValue.name,
                     rating: currentValue.rating,
                     description: currentValue.description,
+                    categoryId: currentValue.categoryId,
                     image: currentValue.image,
                     orderIndex: currentValue.orderIndex,
                     type: currentValue.type,
@@ -183,6 +185,30 @@ class ProductService {
         }
 
         return mergedData;
+    }
+
+    async changeOrderIndex(data) {
+        if (!data || !Array.isArray(data)) {
+            throw ApiError.badRequest('Отправьте корректные данные', [
+                {
+                    name: 'changeOrderIndex',
+                    description: 'Ошибка изменения индекса продуктов'
+                }
+            ])
+        }
+
+        const dataPromises = data.map(async (item) => {
+            return await Product.update({ orderIndex: item.orderIndex }, {
+                where: {
+                    id: item.id
+                }
+            })
+        })
+
+        await Promise.all(dataPromises);
+
+        return 'Successfully changed';
+
     }
 }
 

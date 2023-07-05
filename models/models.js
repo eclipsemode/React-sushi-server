@@ -94,7 +94,7 @@ const Product = sequelize.define("product", {
     rating: {type: DataTypes.INTEGER, defaultValue: 1},
     description: {type: DataTypes.STRING, allowNull: false},
     image: {type: DataTypes.STRING, allowNull: false},
-    orderIndex: {type: DataTypes.INTEGER, defaultValue: null},
+    orderIndex: {type: DataTypes.INTEGER, allowNull: false},
     type: {type: DataTypes.ENUM('pizza', 'other'), defaultValue: 'other'},
 });
 

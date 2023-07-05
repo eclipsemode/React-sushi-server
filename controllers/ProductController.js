@@ -43,6 +43,16 @@ class ProductController {
     }
   }
 
+  async changeOrderIndex(req, res, next) {
+    try {
+      const { data } = req.body;
+      const result = await ProductService.changeOrderIndex(data);
+      return res.json(result);
+    } catch (e) {
+      next(e)
+    }
+  }
+
 }
 
 module.exports = new ProductController();
