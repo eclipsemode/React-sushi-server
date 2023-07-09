@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const uuid = require("uuid");
 const path = require("path");
 const {Product, ProductSize} = require("../models/models");
+const {Model, Sequelize} = require("sequelize");
 
 class ProductService {
     async create({name, price, description, categoryId, rating, sku, orderIndex, type, size}, image) {
@@ -93,16 +94,31 @@ class ProductService {
 
         if (!!categoryId) {
             if (!sortBy || !sortOrder) next(ApiError.badRequest("Не указана сортировка."));
-            products = await Product.findAll({
-                include: [{model: ProductSize, as: 'sizes'}],
-                where: {categoryId},
-                order: [
-                    [sortBy, sortOrder]
-                ]
-            });
+
+            if (sortBy === 'price') {
+                products = await Product.findAll({
+                    include: [{model: ProductSize, as: 'sizes', required: true}],
+                    where: {categoryId},
+                    order: [
+                        ['sizes', sortBy, sortOrder]
+                    ]
+                });
+            } else {
+                products = await Product.findAll({
+                    include: [{model: ProductSize, as: 'sizes'}],
+                    where: {categoryId},
+                    order: [
+                        [sortBy, sortOrder]
+                    ]
+                });
+            }
+
         } else {
             products = await Product.findAll({
-                include: [{model: ProductSize, as: 'sizes'}]
+                include: [{model: ProductSize, as: 'sizes'}],
+                order: [
+                    ['orderIndex', 'ASC']
+                ]
             });
         }
 
