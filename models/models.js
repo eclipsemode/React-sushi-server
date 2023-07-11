@@ -102,7 +102,7 @@ const ProductSize = sequelize.define("productSize", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     size: {type: DataTypes.STRING},
     price: {type: DataTypes.INTEGER, allowNull: false},
-    sku: {type: DataTypes.STRING, defaultValue: null},
+    sku: {type: DataTypes.STRING, defaultValue: null, unique: true},
 })
 
 const Category = sequelize.define("category", {

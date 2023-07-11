@@ -151,6 +151,7 @@ class ProductService {
     }
 
     async change(id, name, price, description, categoryId, rating, sku, orderIndex, type, size, image) {
+        const allProducts = Product.findAll();
         const foundProduct = await Product.findOne({
             where: {id},
             include: [{model: ProductSize, as: 'sizes'}]
@@ -169,15 +170,15 @@ class ProductService {
             ])
         }
 
-        const parsedSize = JSON.parse(size);
+        const parsedSize = size ?  JSON.parse(size) : null;
         const parsedPrice = JSON.parse(price);
-        const parsedSku = JSON.parse(sku).length > 0 ? JSON.parse(sku) : null;
+        const parsedSku = sku ? JSON.parse(sku) : null;
 
-        const sizePromises = parsedSize.map(async (_, index) => {
+        const sizePromises = parsedPrice.map(async (_, index) => {
             return await ProductSize.create({
-                size: parsedSize[index],
+                size: parsedSize ? parsedSize[index] : null,
                 price: parsedPrice[index],
-                sku: parsedSku[index],
+                sku: parsedSku ? parsedSku[index] : null,
                 productId: foundProduct.id
             })
         })
@@ -196,8 +197,8 @@ class ProductService {
 
             foundProduct.image = fileName;
         }
-        foundProduct.orderIndex = orderIndex;
-        foundProduct.type = type;
+        foundProduct.orderIndex = orderIndex ? orderIndex : (await allProducts).length  === 1 ? 1 : (await allProducts).length + 1;
+        foundProduct.type = type ? type : foundProduct.type;
         foundProduct.categoryId = categoryId;
         foundProduct.save();
 
