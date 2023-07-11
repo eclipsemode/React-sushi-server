@@ -2,8 +2,7 @@ const ApiError = require("../error/ApiError");
 const fs = require('fs-extra');
 const uuid = require("uuid");
 const path = require("path");
-const {Product, ProductSize} = require("../models/models");
-const {Model, Sequelize} = require("sequelize");
+const {Product, ProductSize, OrderProduct} = require("../models/models");
 
 class ProductService {
     async create({name, price, description, categoryId, rating, sku, orderIndex, type, size}, image) {
@@ -83,9 +82,16 @@ class ProductService {
         const imagePath = path.join(__dirname, '..', 'static', foundProduct.image);
 
         await fs.remove(imagePath);
+
+        await OrderProduct.update(
+            { image: 'images/not-found-product.jpg' },
+            { where: { image: foundProduct.image } }
+        )
+
         await Product.destroy({
             where: {id}
         });
+
         return "Deleted successfully";
     }
 
