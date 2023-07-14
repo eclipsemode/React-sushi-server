@@ -4,7 +4,9 @@ const CategoryService = require('../service/CategoryService');
 class CategoryController {
   async create(req, res, next) {
     try {
-      const category = await CategoryService.create(req.body)
+      const {name} = req.body;
+      const {image} = req.files;
+      const category = await CategoryService.create(name, image)
       return res.json(category);
     } catch (e) {
       return next(ApiError.badRequest(e.message));

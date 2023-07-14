@@ -107,7 +107,8 @@ const ProductSize = sequelize.define("productSize", {
 
 const Category = sequelize.define("category", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, unique: true, allowNull: false}
+    name: {type: DataTypes.STRING, unique: true, allowNull: false},
+    image: {type: DataTypes.STRING}
 });
 
 User.hasOne(Token);
