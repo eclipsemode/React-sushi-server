@@ -14,7 +14,11 @@ class CategoryService {
   }
 
   async getAll() {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      order: [
+        ['orderIndex', 'asc']
+      ]
+    });
     return categories;
   }
 
@@ -112,8 +116,8 @@ class CategoryService {
       ])
     }
 
-    const categoryPromises = data.map(async (item) => {
-      return await Category.update({orderIndex: item.orderIndex}, {
+    const categoryPromises = data.map(async (item, index) => {
+      return await Category.update({orderIndex: index + 1}, {
         where: {id: item.id}
       })
     })
