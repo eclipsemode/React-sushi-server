@@ -6,9 +6,10 @@ const fs = require('fs-extra');
 
 class CategoryService {
   async create(name, image) {
+    const allCategories = await Category.findAll();
     let fileName = uuid.v4() + ".jpg";
     await image.mv(path.resolve(__dirname, "..", "static/images/category", fileName));
-    const category = await Category.create({name, image: fileName});
+    const category = await Category.create({name, image: fileName, orderIndex: (allCategories.at(-1) || 0) + 1});
     return category;
   }
 
@@ -50,6 +51,76 @@ class CategoryService {
       where: { id }
     })
     return 'Deleted successfully';
+  }
+
+  async change(id, name, image){
+    if (!id) {
+      throw ApiError.badRequest('Введите "id" категории', [
+        {
+          name: 'change',
+          description: 'Ошибка изменения категории'
+        }
+      ])
+    }
+
+    if (!name) {
+      throw ApiError.badRequest('Введите "name" категории', [
+        {
+          name: 'change',
+          description: 'Ошибка изменения категории'
+        }
+      ])
+    }
+
+
+    const foundCategory = await Category.findOne({
+      where: {
+        id
+      }
+    })
+
+    if (!foundCategory) {
+      throw ApiError.badRequest('Категория не найдена', [
+        {
+          name: 'change',
+          description: 'Ошибка изменения категории'
+        }
+      ])
+    }
+
+    foundCategory.name = name;
+    if (image) {
+      const fileName = uuid.v4() + ".jpg";
+      await image.mv(path.resolve(__dirname, "..", "static/images/category", fileName));
+      if (foundCategory.image) {
+        fs.remove(path.resolve(__dirname, "..", "static/images/category", foundCategory.image))
+      }
+      foundCategory.image = fileName;
+    }
+    await foundCategory.save();
+
+    return await foundCategory;
+  }
+
+  async changeOrder(data) {
+    if (!data) {
+      throw ApiError.badRequest('Отсутствует массив категорий', [
+        {
+          name: 'changeOrder',
+          description: 'Ошибка изменения порядка категории'
+        }
+      ])
+    }
+
+    const categoryPromises = data.map(async (item) => {
+      return await Category.update({orderIndex: item.orderIndex}, {
+        where: {id: item.id}
+      })
+    })
+
+    await Promise.all(categoryPromises);
+
+    return 'Successfully changed';
   }
 }
 

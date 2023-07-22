@@ -6,7 +6,6 @@ const {Product, ProductSize, OrderProduct} = require("../models/models");
 
 class ProductService {
     async create({name, price, description, categoryId, rating, sku, orderIndex, type, size}, image) {
-
         if (!!type && type !== 'pizza' && type !== 'other') {
             throw ApiError.badRequest('Тип может быть "pizza" или "other"', [
                 {
