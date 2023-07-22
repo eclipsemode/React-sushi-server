@@ -1,4 +1,4 @@
-const { Category } = require("../models/models");
+const { Category, Product} = require("../models/models");
 const uuid = require("uuid");
 const path = require("path");
 const ApiError = require("../error/ApiError");
@@ -26,6 +26,21 @@ class CategoryService {
 
     if (!id) {
       throw ApiError.badRequest('Введите "id" категории', [
+        {
+          name: 'delete',
+          description: 'Ошибка удаления категории'
+        }
+      ])
+    }
+
+    const foundProductsInCategory = await Product.findOne({
+      where: {
+        categoryId: id
+      }
+    })
+
+    if (foundProductsInCategory) {
+      throw ApiError.badRequest('В категории присутствуют товары, удаление невозможно', [
         {
           name: 'delete',
           description: 'Ошибка удаления категории'
