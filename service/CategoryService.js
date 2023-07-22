@@ -9,7 +9,7 @@ class CategoryService {
     const allCategories = await Category.findAll();
     let fileName = uuid.v4() + ".jpg";
     await image.mv(path.resolve(__dirname, "..", "static/images/category", fileName));
-    const category = await Category.create({name, image: fileName, orderIndex: (allCategories.at(-1) || 0) + 1});
+    const category = await Category.create({name, image: fileName, orderIndex: allCategories.length + 1});
     return category;
   }
 
