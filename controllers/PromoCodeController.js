@@ -7,7 +7,7 @@ class PromoCodeController {
 
             const promoCode = await PromoCodeService.create(req.body);
 
-            return res.status(200).json({ status: 200, data: promoCode, message: "Промокод успешно создан" });
+            return res.status(200).json(promoCode);
         } catch (error) {
             next(error);
         }
@@ -16,7 +16,7 @@ class PromoCodeController {
     async getAll(req, res, next) {
         try {
             const promoCodes = await PromoCodeService.getAll(req.body);
-            return res.status(200).json({ status: 200, data: promoCodes });
+            return res.status(200).json(promoCodes);
         } catch (error) {
             next(error);
         }
@@ -25,7 +25,7 @@ class PromoCodeController {
     async delete(req, res, next) {
         try {
             const deletedMessage = await PromoCodeService.delete(req.body)
-            return res.status(200).json({status: 200, message: deletedMessage});
+            return res.status(200).json(deletedMessage);
         } catch (error) {
             next(error)
         }
@@ -34,7 +34,7 @@ class PromoCodeController {
     async change(req, res,next) {
         try {
             const newPromoCode = await PromoCodeService.change(req.body)
-            return res.status(200).json({status: 200, data: newPromoCode});
+            return res.status(200).json(newPromoCode);
         } catch (error) {
             next(error)
         }
