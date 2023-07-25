@@ -15,7 +15,8 @@ class PromoCodeController {
 
     async getAll(req, res, next) {
         try {
-            const promoCodes = await PromoCodeService.getAll(req.body);
+            const { page, size, match } = req.query;
+            const promoCodes = await PromoCodeService.getAll(page, size, match);
             return res.status(200).json(promoCodes);
         } catch (error) {
             next(error);

@@ -1,5 +1,6 @@
 const {Promocode} = require("../models/models");
 const ApiError = require("../error/ApiError");
+const {Op} = require("sequelize");
 
 class PromoCodeService {
     async create({code, discount, type, limit}) {
@@ -69,20 +70,19 @@ class PromoCodeService {
         return foundCode;
     }
 
-    async getAll() {
-        const promoCodes = await Promocode.findAll({
+    async getAll(page, size, match) {
+        const promoCodes = await Promocode.findAndCountAll({
+            limit: size || null,
+            offset: (page - 1) * 3 || null,
             order: [
                 ['code', 'asc']
-            ]
-        });
-        if (promoCodes.length === 0) {
-            throw ApiError.internal('Ошибка получения промокодов', [
-                {
-                    name: 'getAll',
-                    description: 'Промокоды отсутствуют'
+            ],
+            where: {
+                code: {
+                    [Op.like]: '%' + (!match ? '' : match) + '%'
                 }
-            ])
-        }
+            }
+        });
 
         return promoCodes;
     }
