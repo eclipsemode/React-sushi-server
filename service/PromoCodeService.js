@@ -70,7 +70,11 @@ class PromoCodeService {
     }
 
     async getAll() {
-        const promoCodes = await Promocode.findAll();
+        const promoCodes = await Promocode.findAll({
+            order: [
+                ['code', 'asc']
+            ]
+        });
         if (promoCodes.length === 0) {
             throw ApiError.internal('Ошибка получения промокодов', [
                 {
