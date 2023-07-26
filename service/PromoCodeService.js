@@ -73,7 +73,7 @@ class PromoCodeService {
     async getAll(page, size, match) {
         const promoCodes = await Promocode.findAndCountAll({
             limit: size || null,
-            offset: (page - 1) * 3 || null,
+            offset: (page - 1) * size || null,
             order: [
                 ['code', 'asc']
             ],

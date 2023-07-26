@@ -26,6 +26,7 @@
     "express-fileupload": "^1.4.0",
     "express-handlebars": "^7.0.7",
     "express-validator": "^7.0.1",
+    "greensms": "^1.9.1",
     "jsonwebtoken": "^9.0.0",
     "nodemailer": "^6.9.1",
     "nodemailer-express-handlebars": "^6.1.0",
