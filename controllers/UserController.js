@@ -3,16 +3,27 @@ const UserService = require("../service/UserService");
 const { validationResult } = require("express-validator");
 
 class UserController {
-  async registration(req, res, next) {
+  async auth(req, res, next) {
     try {
+      const {tel} = req.body;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(ApiError.badRequest("Ошибка валидации.", errors.array()));
       }
-      const user = await UserService.registration(req.body, next);
-      return res.json("Confirm registration.");
+      const user = await UserService.auth(tel);
+      return res.json(user);
     } catch (e) {
-      return next(ApiError.badRequest(e.message));
+      return next(e);
+    }
+  }
+
+  async confirm(req, res, next) {
+    try {
+      const { code, requestId } = req.body;
+      const confirm = await UserService.confirm(code, requestId);
+      return res.json(confirm);
+    } catch (e) {
+      return next(e);
     }
   }
 

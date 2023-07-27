@@ -3,23 +3,31 @@ const {DataTypes} = require("sequelize");
 
 const User = sequelize.define("user", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    email: {type: DataTypes.STRING, unique: true, allowNull: false, validate: {notEmpty: true, isEmail: true}},
+    email: {type: DataTypes.STRING},
     dateOfBirth: {type: DataTypes.DATE},
-    password: {type: DataTypes.STRING, allowNull: false},
     role: {type: DataTypes.ENUM('USER', 'ADMIN'), defaultValue: "USER"},
-    name: {type: DataTypes.STRING, allowNull: false, validate: {notEmpty: true}},
+    name: {type: DataTypes.STRING},
     surname: {type: DataTypes.STRING},
     tel: {type: DataTypes.STRING, allowNull: false, unique: true},
     street: {type: DataTypes.STRING},
-    house: {type: DataTypes.NUMBER},
-    floor: {type: DataTypes.NUMBER},
-    entrance: {type: DataTypes.NUMBER},
-    room: {type: DataTypes.NUMBER},
+    house: {type: DataTypes.INTEGER},
+    floor: {type: DataTypes.INTEGER},
+    entrance: {type: DataTypes.INTEGER},
+    room: {type: DataTypes.INTEGER},
     isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
-    activationLink: {type: DataTypes.STRING}
 }, {
     timestamps: true
 });
+
+const Confirmation = sequelize.define("confirmation", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    requestId: {type: DataTypes.STRING, allowNull: false},
+    code: {type: DataTypes.INTEGER, allowNull: false},
+    expiresIn: {type: DataTypes.DATE, allowNull: false},
+    used: {type: DataTypes.BOOLEAN, defaultValue: false}
+}, {
+    timestamps: true
+})
 
 const Token = sequelize.define("token", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -120,6 +128,14 @@ Token.belongsTo(User, {
     }
 });
 
+User.hasOne(Confirmation);
+Confirmation.belongsTo(User, {
+    foreignKey: {
+        name: 'userId',
+        allowNull: false
+    }
+})
+
 User.hasMany(Order);
 Order.belongsTo(User, {
     foreignKey: {
@@ -154,6 +170,7 @@ ProductSize.belongsTo(Product, {
 
 module.exports = {
     User,
+    Confirmation,
     Order,
     OrderProduct,
     Product,
