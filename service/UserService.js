@@ -1,12 +1,8 @@
 const { User, Token, Confirmation} = require('../models/models');
-const MailService = require('./MailService');
 const ApiError = require("../error/ApiError");
-const bcrypt = require("bcrypt");
 const TokenService = require('./TokenService');
 const UserDto = require('../dto/UserDto');
-const uuid = require('uuid');
 const GreenSMS = require("greensms");
-const jwt = require("jsonwebtoken");
 const RegistrationDto = require('../dto/RegistrationDto');
 
 class UserService {
@@ -153,10 +149,19 @@ class UserService {
       ])
     }
 
+    if (foundConfirmation.used) {
+      throw ApiError.badRequest('Данные более недействительны, попробуйте позднее', [
+        {
+          name: 'confirm',
+          description: 'Ошибка подтверждения'
+        }
+      ])
+    }
+
     foundConfirmation.used = true;
     foundConfirmation.save();
 
-    if (Date.now() - foundConfirmation.expiresIn.getTime() > 60000) {
+    if (Date.now() > foundConfirmation.expiresIn.getTime()) {
       throw ApiError.badRequest('Время ввода кода истекло', [
         {
           name: 'confirm',
@@ -186,42 +191,42 @@ class UserService {
     }
   }
 
-  async activate(activationLink, next) {
-    const user = await User.findOne({ where: { activationLink } });
-    if (!user) {
-      return next(ApiError.badRequest('Неккоректная ссылка активации.'));
-    }
-    await User.update({ isActivated: true, activationLink: null }, { where: { activationLink } });
-  }
+  // async activate(activationLink, next) {
+  //   const user = await User.findOne({ where: { activationLink } });
+  //   if (!user) {
+  //     return next(ApiError.badRequest('Неккоректная ссылка активации.'));
+  //   }
+  //   await User.update({ isActivated: true, activationLink: null }, { where: { activationLink } });
+  // }
 
-  async login({ email, password }, next) {
-    const user = await User.findOne({where: {email}});
-
-    if (!user) {
-      return next(ApiError.badRequest('Пользователь с таким email не найден.'))
-    }
-
-    const comparePassword = bcrypt.compareSync(password, user.password);
-
-    if (!comparePassword) {
-      return next(ApiError.badRequest('Указан неверный пароль.'))
-    }
-
-    const checkActivated = user.isActivated;
-
-    if (!checkActivated) {
-      return next(ApiError.badRequest('Аккаунт не активирован, проверьте почту.'))
-    }
-
-    const userDto = new UserDto(user);
-    const tokens = TokenService.generateTokens({...userDto});
-
-    await TokenService.saveToken(userDto.id, tokens.refreshToken);
-    return {
-      ...tokens,
-      user: userDto
-    }
-  }
+  // async login({ email, password }, next) {
+  //   const user = await User.findOne({where: {email}});
+  //
+  //   if (!user) {
+  //     return next(ApiError.badRequest('Пользователь с таким email не найден.'))
+  //   }
+  //
+  //   const comparePassword = bcrypt.compareSync(password, user.password);
+  //
+  //   if (!comparePassword) {
+  //     return next(ApiError.badRequest('Указан неверный пароль.'))
+  //   }
+  //
+  //   const checkActivated = user.isActivated;
+  //
+  //   if (!checkActivated) {
+  //     return next(ApiError.badRequest('Аккаунт не активирован, проверьте почту.'))
+  //   }
+  //
+  //   const userDto = new UserDto(user);
+  //   const tokens = TokenService.generateTokens({...userDto});
+  //
+  //   await TokenService.saveToken(userDto.id, tokens.refreshToken);
+  //   return {
+  //     ...tokens,
+  //     user: userDto
+  //   }
+  // }
 
   async logout(refreshToken) {
     return await TokenService.removeToken(refreshToken);
@@ -261,17 +266,15 @@ class UserService {
     return user;
   }
 
-  async patchUserData({ id, email, name, surname, dateOfBirth, tel, street, house, floor, entrance, room }, next) {
+  async patchUserData({ id, email, name, surname, dateOfBirth, street, house, floor, entrance, room }, next) {
       const user = await User.findOne({ where: { id } });
 
       const userData = {
         id: user.id,
-        password: user.password,
         email: email,
         name: name,
         surname: surname,
         dateOfBirth: dateOfBirth,
-        tel: tel,
         street: street,
         house: house,
         floor: floor,
@@ -284,27 +287,27 @@ class UserService {
       return userData;
   }
 
-  async changeUsersEmail( {email, id}, next ) {
-    const candidateEmail = await User.findOne( { where: { email } } );
-    const user = await User.findOne({ where: { id } })
-
-    if (candidateEmail) {
-      return next(ApiError.badRequest('Пользователь с таким email уже существует.'))
-    }
-
-    const activationLink = await uuid.v4();
-
-    const userData = {
-      email,
-      activationLink,
-      isActivated: false
-    }
-
-    await User.update(userData, { where: { id } });
-
-    await MailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
-
-  }
+  // async changeUsersEmail( {email, id}, next ) {
+  //   const candidateEmail = await User.findOne( { where: { email } } );
+  //   const user = await User.findOne({ where: { id } })
+  //
+  //   if (candidateEmail) {
+  //     return next(ApiError.badRequest('Пользователь с таким email уже существует.'))
+  //   }
+  //
+  //   const activationLink = await uuid.v4();
+  //
+  //   const userData = {
+  //     email,
+  //     activationLink,
+  //     isActivated: false
+  //   }
+  //
+  //   await User.update(userData, { where: { id } });
+  //
+  //   await MailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
+  //
+  // }
 }
 
 module.exports = new UserService();

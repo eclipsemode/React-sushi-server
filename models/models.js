@@ -15,6 +15,7 @@ const User = sequelize.define("user", {
     entrance: {type: DataTypes.INTEGER},
     room: {type: DataTypes.INTEGER},
     isActivated: {type: DataTypes.BOOLEAN, defaultValue: false},
+    bonus: {type: DataTypes.INTEGER, defaultValue: 0}
 }, {
     timestamps: true
 });
@@ -56,6 +57,7 @@ const Promocode = sequelize.define("promocode", {
 
 const Order = sequelize.define("order", {
         id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+        orderId: {type: DataTypes.INTEGER},
         totalPrice: {type: DataTypes.INTEGER, allowNull: false},
         totalAmount: {type: DataTypes.INTEGER, allowNull: false},
         type: {type: DataTypes.ENUM('delivery', 'pickup'), allowNull: false},
@@ -72,7 +74,7 @@ const Order = sequelize.define("order", {
         payment: {type: DataTypes.ENUM('cash', 'card'), allowNull: false},
         commentary: {type: DataTypes.TEXT},
         promocode: {type: DataTypes.STRING, allowNull: true},
-        status: {type: DataTypes.ENUM('new', 'production', 'produced', 'delivery', 'completed', 'deleted'), allowNull: false, defaultValue: 'new'}
+        status: {type: DataTypes.ENUM('new', 'accepted', 'production', 'produced', 'delivery', 'completed', 'deleted'), allowNull: false, defaultValue: 'new'}
     },
     {
         timestamps: true

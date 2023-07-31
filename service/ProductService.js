@@ -87,6 +87,12 @@ class ProductService {
             { where: { image: foundProduct.image } }
         )
 
+        await ProductSize.destroy({
+            where: {
+                productId: foundProduct.id
+            }
+        })
+
         await Product.destroy({
             where: {id}
         });

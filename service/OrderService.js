@@ -3,7 +3,7 @@ const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
-    async create(userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
+    async create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
 
         let order;
         let orderProducts = [];
@@ -84,7 +84,7 @@ class OrderService {
         })
 
         if (!foundPromoCode) {
-            order = await Order.create({userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            order = await Order.create({userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
             const productsPromises = products.map(async (item) => {
                 return await OrderProduct.create({
                     ...item,
@@ -159,6 +159,52 @@ class OrderService {
         order.status = status;
         order.save();
 
+        return order;
+    }
+
+    async changeStatusWebhook(action, order_id, status, datetime) {
+        const order = await Order.findOne({
+            where: {
+                orderId: order_id
+            }
+        })
+
+        if (!order) {
+            throw ApiError.badRequest('Данного заказа не существует', [
+                {
+                    name: 'changeStatusWebhook',
+                    description: 'Ошибка изменения статуса заказа'
+                }
+            ])
+        }
+
+        switch (status) {
+            case 1:
+                order.status = 'new';
+                break;
+            case 3:
+                order.status = 'production';
+                break;
+            case 13:
+                order.status = 'accepted';
+                break;
+            case 12:
+                order.status = 'produced';
+                break;
+            case 4:
+                order.status = 'delivery';
+                break;
+            case 11:
+                order.status = 'deleted';
+                break;
+            case 10:
+                order.status = 'completed';
+                break;
+            default:
+                order.status = 'new';
+        }
+
+        order.save();
         return order;
     }
 

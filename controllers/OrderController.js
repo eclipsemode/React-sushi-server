@@ -4,8 +4,8 @@ const OrderService = require('../service/OrderService');
 class OrderController {
   async create(req, res, next) {
     try {
-      const {userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products} = req.body;
-      const order = await OrderService.create(userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products);
+      const {userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products} = req.body;
+      const order = await OrderService.create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products);
       return res.json(order);
     } catch (error) {
       next(error)
@@ -36,6 +36,16 @@ class OrderController {
       const { id, status } = req.body;
       const order = await OrderService.changeStatus(id, status);
       return res.json(order);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async changeStatusWebhook(req, res, next) {
+    try {
+      const {action, order_id, status, datetime} = req.body;
+      const order = await OrderService.changeStatusWebhook(action, order_id, status, datetime);
+      return res.status(200).json();
     } catch (e) {
       next(e);
     }

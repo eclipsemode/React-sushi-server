@@ -6,12 +6,12 @@ const registrationSchema = require("../validation/registration-schema");
 
 router.post("/auth", registrationSchema, userController.auth);
 router.post("/confirm", userController.confirm);
-router.get("/activate/:link", userController.activate);
+// router.get("/activate/:link", userController.activate);
 router.get("/refresh", userController.refresh);
-router.post("/login", userController.login);
+// router.post("/login", userController.login);
 router.get("/logout", userController.logout);
 router.get("/info", authMiddleware, userController.getUserData);
 router.patch("/patch", authMiddleware, userController.patchUserData);
-router.patch('/change-email', authMiddleware, userController.changeUsersEmail)
+// router.patch('/change-email', authMiddleware, userController.changeUsersEmail)
 
 module.exports = router;
