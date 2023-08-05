@@ -1,4 +1,4 @@
-const { Order, Product, Promocode, OrderProduct} = require('../models/models');
+const { Order, Product, Promocode, OrderProduct, Bonus, User} = require('../models/models');
 const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
@@ -108,6 +108,10 @@ class OrderService {
             orderProducts = await Promise.all(productsPromises);
         }
 
+        await Bonus.create({
+            orderId: order.id
+        })
+
         return {
             ...order.dataValues,
             orderProducts
@@ -178,32 +182,96 @@ class OrderService {
             ])
         }
 
-        switch (status) {
-            case 1:
-                order.status = 'new';
-                break;
-            case 3:
-                order.status = 'production';
-                break;
-            case 13:
-                order.status = 'accepted';
-                break;
-            case 12:
-                order.status = 'produced';
-                break;
-            case 4:
-                order.status = 'delivery';
-                break;
-            case 11:
-                order.status = 'deleted';
-                break;
-            case 10:
-                order.status = 'completed';
-                break;
-            default:
-                order.status = 'new';
+        const bonus = await Bonus.findOne({
+            where: {
+                orderId: order.id
+            }
+        });
+
+        if (!bonus) {
+            throw ApiError.badRequest('Отсутствует бонусный счет заказа', [
+                {
+                    name: 'changeStatusWebhook',
+                    description: 'Ошибка изменения статуса заказа'
+                }
+            ])
         }
 
+        const user = await User.findOne({
+            where: {
+                id: order.userId
+            }
+        })
+
+        const bonusScore = order.totalPrice / 100;
+
+        switch (status) {
+            case 1:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'new';
+                bonus.score = 0;
+                break;
+            case 3:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'production';
+                bonus.score = 0;
+                break;
+            case 13:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'accepted';
+                bonus.score = 0;
+                break;
+            case 12:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'produced';
+                bonus.score = 0;
+                break;
+            case 4:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'delivery';
+                bonus.score = 0;
+                break;
+            case 11:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'deleted';
+                bonus.score = 0;
+                break;
+            case 10:
+                if (user && order.status !== 'completed') {
+                    user.bonus = user.bonus + bonusScore;
+                    user.save();
+                }
+                order.status = 'completed';
+                bonus.score = bonusScore;
+                break;
+            default:
+                if (user && order.status === 'completed') {
+                    user.bonus = user.bonus - bonusScore;
+                    user.save();
+                }
+                order.status = 'new';
+                bonus.score = 0;
+        }
+
+        bonus.save();
         order.save();
         return order;
     }

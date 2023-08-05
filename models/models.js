@@ -20,6 +20,11 @@ const User = sequelize.define("user", {
     timestamps: true
 });
 
+const Bonus = sequelize.define("bonus", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    score: {type: DataTypes.INTEGER, defaultValue: 0}
+})
+
 const Confirmation = sequelize.define("confirmation", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     requestId: {type: DataTypes.STRING, allowNull: false},
@@ -146,6 +151,14 @@ Order.belongsTo(User, {
     }
 })
 
+Order.hasOne(Bonus);
+Bonus.belongsTo(Order, {
+    foreignKey: {
+        name: 'orderId',
+        allowNull: false
+    }
+})
+
 Order.hasMany(OrderProduct, { as: 'products' });
 OrderProduct.belongsTo(Order, {
     foreignKey: {
@@ -179,5 +192,6 @@ module.exports = {
     Category,
     Token,
     Promocode,
-    ProductSize
+    ProductSize,
+    Bonus
 };
