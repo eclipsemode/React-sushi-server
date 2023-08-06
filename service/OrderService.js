@@ -1,9 +1,9 @@
-const { Order, Product, Promocode, OrderProduct, Bonus, User} = require('../models/models');
+const { Order, Product, Promocode, OrderProduct, Bonus, User, Branch} = require('../models/models');
 const ApiError = require("../error/ApiError");
 const PromoCodeService = require('../service/PromoCodeService');
 
 class OrderService {
-    async create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products) {
+    async create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products, branchId) {
 
         let order;
         let orderProducts = [];
@@ -77,6 +77,21 @@ class OrderService {
             ])
         }
 
+        const foundBranch = await Branch.findOne({
+            where: {
+                id: branchId
+            }
+        })
+
+        if (!foundBranch) {
+            throw ApiError.badRequest('Отсутствует "id" филиала', [
+                {
+                    name: 'create',
+                    description: 'Ошибка создания заказа'
+                }
+            ])
+        }
+
         const foundPromoCode = await Promocode.findOne({
             where: {
                 code: promocode
@@ -84,7 +99,7 @@ class OrderService {
         })
 
         if (!foundPromoCode) {
-            order = await Order.create({userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            order = await Order.create({userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, branchId: foundBranch.id});
             const productsPromises = products.map(async (item) => {
                 return await OrderProduct.create({
                     ...item,
@@ -96,7 +111,7 @@ class OrderService {
 
         } else {
             await PromoCodeService.use(promocode);
-            order = await Order.create({userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status});
+            order = await Order.create({userId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, branchId: foundBranch.id});
 
             const productsPromises = products.map(async (item) => {
                 return await OrderProduct.create({

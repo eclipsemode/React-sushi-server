@@ -4,8 +4,8 @@ const OrderService = require('../service/OrderService');
 class OrderController {
   async create(req, res, next) {
     try {
-      const {userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products} = req.body;
-      const order = await OrderService.create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products);
+      const {userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products, branchId} = req.body;
+      const order = await OrderService.create(userId, orderId, totalPrice, totalAmount, type, name, address, entrance, floor, room, tel, email, day, time, utensils, payment, commentary, promocode, status, products, branchId);
       return res.json(order);
     } catch (error) {
       next(error)

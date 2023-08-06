@@ -1,5 +1,6 @@
 const sequelize = require("../db");
 const {DataTypes} = require("sequelize");
+const branches = require('../data/branches')
 
 const User = sequelize.define("user", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -19,6 +20,11 @@ const User = sequelize.define("user", {
 }, {
     timestamps: true
 });
+
+const Branch = sequelize.define('branch', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.ENUM(...Object.values(branches)), allowNull: false}
+})
 
 const Bonus = sequelize.define("bonus", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -135,6 +141,14 @@ Token.belongsTo(User, {
     }
 });
 
+Branch.hasMany(Order);
+Order.belongsTo(Branch, {
+    foreignKey: {
+        name: 'branchId',
+        allowNull: false
+    }
+});
+
 User.hasOne(Confirmation);
 Confirmation.belongsTo(User, {
     foreignKey: {
@@ -193,5 +207,6 @@ module.exports = {
     Token,
     Promocode,
     ProductSize,
-    Bonus
+    Bonus,
+    Branch
 };
