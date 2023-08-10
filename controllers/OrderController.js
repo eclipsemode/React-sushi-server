@@ -31,16 +31,6 @@ class OrderController {
     }
   }
 
-  async changeStatus(req, res, next) {
-    try {
-      const { id, status } = req.body;
-      const order = await OrderService.changeStatus(id, status);
-      return res.json(order);
-    } catch (e) {
-      next(e);
-    }
-  }
-
   async changeStatusWebhook(req, res, next) {
     try {
       const {action, order_id, status, datetime} = req.body;

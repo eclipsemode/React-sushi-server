@@ -6,7 +6,6 @@ const authMiddleware = require("../middleware/authMiddleware");
 router.post('/create', orderController.create);
 router.get('/get', authMiddleware, orderController.getAll);
 router.get('/get/:id', authMiddleware, orderController.getAllByUserId );
-router.patch('/change-status', orderController.changeStatus);
 router.post('/change-status-webhook', orderController.changeStatusWebhook);
 
 module.exports = router;

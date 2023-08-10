@@ -150,37 +150,6 @@ class OrderService {
         return orders;
     }
 
-    async changeStatus(id, status) {
-        const order = await Order.findOne({
-            where: {
-                id
-            }
-        })
-
-        if (!order) {
-            throw ApiError.badRequest('Данного заказа не существует', [
-                {
-                    name: 'changeStatus',
-                    description: 'Ошибка изменения статуса заказа'
-                }
-            ])
-        }
-
-        if (status !== 'new' && status !== 'production' && status !== 'produced' && status !== 'delivery' && status !== 'completed' && status !== 'deleted') {
-            throw ApiError.badRequest('Неверное новое значение статуса', [
-                {
-                    name: 'changeStatus',
-                    description: 'Ошибка изменения статуса заказа'
-                }
-            ])
-        }
-
-        order.status = status;
-        order.save();
-
-        return order;
-    }
-
     async changeStatusWebhook(action, order_id, status, datetime) {
         const order = await Order.findOne({
             where: {

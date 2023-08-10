@@ -1,6 +1,5 @@
 const sequelize = require("../db");
 const {DataTypes} = require("sequelize");
-const branches = require('../data/branches')
 
 const User = sequelize.define("user", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -23,7 +22,7 @@ const User = sequelize.define("user", {
 
 const Branch = sequelize.define('branch', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.ENUM(...Object.values(branches)), allowNull: false}
+    name: {type: DataTypes.STRING, allowNull: false}
 })
 
 const Bonus = sequelize.define("bonus", {
