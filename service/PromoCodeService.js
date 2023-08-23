@@ -14,7 +14,7 @@ class PromoCodeService {
             ]);
         }
 
-        if (typeof limit !== 'number' && limit !== 'infinite') {
+        if (limit !== 'infinite' && !parseInt(limit)) {
             throw ApiError.badRequest('Неверный лимит промокода', [
                 {
                     name: 'create',
