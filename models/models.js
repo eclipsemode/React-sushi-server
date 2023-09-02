@@ -84,7 +84,8 @@ const Order = sequelize.define("order", {
         payment: {type: DataTypes.ENUM('cash', 'card'), allowNull: false},
         commentary: {type: DataTypes.TEXT},
         promocode: {type: DataTypes.STRING, allowNull: true},
-        status: {type: DataTypes.ENUM('new', 'accepted', 'production', 'produced', 'delivery', 'completed', 'deleted'), allowNull: false, defaultValue: 'new'}
+        status: {type: DataTypes.ENUM('new', 'accepted', 'production', 'produced', 'delivery', 'completed', 'deleted'), allowNull: false, defaultValue: 'new'},
+        channel: {type: DataTypes.INTEGER, defaultValue: 2030}
     },
     {
         timestamps: true
