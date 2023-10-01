@@ -23,8 +23,8 @@ class OrderController {
 
   async getAllByUserId(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params as unknown as {id: number};
-      const orders = await OrderService.getAllByUserId(id);
+      const {id, page, size} = req.query as unknown as {id: number, page: number, size: number}
+      const orders = await OrderService.getAllByUserId(id, page, size);
       return res.json(orders);
     } catch (e) {
       next(ApiError.badRequest('Произошла ошибка.'));

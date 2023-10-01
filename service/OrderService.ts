@@ -150,13 +150,13 @@ class OrderService {
         return orders;
     }
 
-    async getAllByUserId(id: number, page?: number, size?: number) {
+    async getAllByUserId(id: number, page: number, size: number) {
         const orders = await Order.findAll({
-            // limit: size || undefined,
-            // offset: (page - 1) * size || undefined,
-            // order: [
-            //     ['createdAt', 'desc']
-            // ],
+            limit: size || undefined,
+            offset: (page - 1) * size || undefined,
+            order: [
+                ['createdAt', 'desc']
+            ],
             where: {
                 userId: id
             },
