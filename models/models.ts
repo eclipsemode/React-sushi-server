@@ -65,7 +65,6 @@ class Bonus extends Model<InferAttributes<Bonus>, InferCreationAttributes<Bonus>
 Bonus.init({
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     score: {type: DataTypes.INTEGER, defaultValue: 0},
-    // orderId: {type: DataTypes.INTEGER, references: { model: 'orders', key: 'id' }}
 }, {
     sequelize,
     tableName: 'bonuses'
@@ -86,7 +85,6 @@ Confirmation.init({
     code: {type: DataTypes.INTEGER, allowNull: false},
     expiresIn: {type: DataTypes.DATE, allowNull: false},
     used: {type: DataTypes.BOOLEAN, defaultValue: false},
-    // userId: {type: DataTypes.INTEGER, references: {model: 'users', key: 'id'}}
 }, {
     timestamps: true,
     sequelize,
@@ -102,7 +100,6 @@ class Token extends Model<InferAttributes<Token>, InferCreationAttributes<Token>
 Token.init({
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     refreshToken: {type: DataTypes.STRING},
-    // userId: {type: DataTypes.INTEGER, references: {model: 'users', key: 'id'}}
 }, {
     sequelize,
     tableName: 'tokens'
@@ -187,8 +184,6 @@ Order.init({
         defaultValue: 'new'
     },
     channel: {type: DataTypes.INTEGER, defaultValue: 2030},
-    // userId: {type: DataTypes.INTEGER, references: {model: 'users', key: 'id'}},
-    // branchId: {type: DataTypes.INTEGER, references: {model: 'branches', key: 'id'}},
 }, {
     timestamps: true,
     sequelize,
@@ -226,7 +221,6 @@ OrderProduct.init({
     price: {type: DataTypes.INTEGER, allowNull: false},
     sku: {type: DataTypes.STRING, defaultValue: null},
     amount: {type: DataTypes.INTEGER, allowNull: false, defaultValue: 1},
-    // orderId: {type: DataTypes.INTEGER, references: {model: 'orders', key: 'id'}}
 }, {
     timestamps: true,
     sequelize,
@@ -253,7 +247,6 @@ Product.init({
     image: {type: DataTypes.STRING, allowNull: false},
     orderIndex: {type: DataTypes.INTEGER, allowNull: false},
     type: {type: DataTypes.ENUM, values: ['pizza', 'other'], defaultValue: 'other'},
-    // categoryId: {type: DataTypes.INTEGER, references: {model: 'categories', key: 'id'}}
 }, {
     sequelize,
     tableName: 'products'
@@ -272,7 +265,6 @@ ProductSize.init({
     size: {type: DataTypes.STRING},
     price: {type: DataTypes.INTEGER, allowNull: false},
     sku: {type: DataTypes.STRING, defaultValue: null, unique: true},
-    // productId: {type: DataTypes.INTEGER, references: {model: 'products', key: 'id'}}
 }, {
     sequelize,
     tableName: 'productSizes'

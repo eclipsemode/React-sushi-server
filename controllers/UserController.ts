@@ -29,26 +29,6 @@ class UserController {
     }
   }
 
-  // async activate(req, res, next) {
-  //   try {
-  //     const activationLink = req.params.link;
-  //     await UserService.activate(activationLink, next);
-  //     return res.redirect(process.env.CLIENT_URL + `/activate/${activationLink}`);
-  //   } catch (e) {
-  //     return next(ApiError.badRequest(e.message));
-  //   }
-  // }
-
-  // async login(req, res, next) {
-  //   try {
-  //     const user = await UserService.login(req.body, next);
-  //     res.cookie("refreshToken", user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-  //     return res.json({ user });
-  //   } catch (e) {
-  //     return next(ApiError.badRequest(e.message));
-  //   }
-  // }
-
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const { refreshToken } = req.cookies;
@@ -89,15 +69,6 @@ class UserController {
       return next(e);
     }
   }
-
-  // async changeUsersEmail(req, res, next) {
-  //   try {
-  //     await UserService.changeUsersEmail(req.body, next);
-  //     return res.status(200).send("Successfully changed.");
-  //   } catch (e) {
-  //     return next(ApiError.badRequest(e.message));
-  //   }
-  // }
 }
 
 export default new UserController();

@@ -18,44 +18,6 @@ interface IPatchUserData {
 }
 
 class UserService {
-    // async registration({ email, password, role, name, surname, dateOfBirth, tel, street, house, floor, entrance, room }, next) {
-    //
-    //   if (!email || !password) {
-    //     return next(ApiError.badRequest('Некорректный email или пароль.'))
-    //   }
-    //
-    //   if (!name) {
-    //     return next(ApiError.badRequest('Введите имя.'))
-    //   }
-    //
-    //   if (!tel) {
-    //     return next(ApiError.badRequest('Введите телефон.'))
-    //   }
-    //
-    //   const candidateEmail = await User.findOne( { where: { email } } );
-    //   const candidateTel = await User.findOne({ where: { tel } });
-    //
-    //   if (candidateEmail) {
-    //     return next(ApiError.badRequest('Пользователь с таким email уже существует.'))
-    //   }
-    //
-    //   if (candidateTel) {
-    //     return next(ApiError.badRequest('Пользователь с таким номером телефона уже существует.'))
-    //   }
-    //
-    //   const hashPassword = await bcrypt.hash(password, 5);
-    //   const activationLink = await uuid.v4();
-    //   const user = await User.create({email, password: hashPassword, role, name, surname, dateOfBirth, tel, street, house, floor, entrance, room, activationLink});
-    //   await MailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
-    //   const userDto = new UserDto(user);
-    //   const tokens = TokenService.generateTokens({ ...userDto });
-    //   await TokenService.saveToken(userDto.id, tokens.refreshToken);
-    //   return {
-    //     ...tokens,
-    //     user: userDto
-    //   }
-    // }
-
     async auth(tel: string) {
         if (!tel) {
             throw ApiError.badRequest('Введите номер телефона', [
@@ -204,43 +166,6 @@ class UserService {
         }
     }
 
-    // async activate(activationLink, next) {
-    //   const user = await User.findOne({ where: { activationLink } });
-    //   if (!user) {
-    //     return next(ApiError.badRequest('Неккоректная ссылка активации.'));
-    //   }
-    //   await User.update({ isActivated: true, activationLink: null }, { where: { activationLink } });
-    // }
-
-    // async login({ email, password }, next) {
-    //   const user = await User.findOne({where: {email}});
-    //
-    //   if (!user) {
-    //     return next(ApiError.badRequest('Пользователь с таким email не найден.'))
-    //   }
-    //
-    //   const comparePassword = bcrypt.compareSync(password, user.password);
-    //
-    //   if (!comparePassword) {
-    //     return next(ApiError.badRequest('Указан неверный пароль.'))
-    //   }
-    //
-    //   const checkActivated = user.isActivated;
-    //
-    //   if (!checkActivated) {
-    //     return next(ApiError.badRequest('Аккаунт не активирован, проверьте почту.'))
-    //   }
-    //
-    //   const userDto = new UserDto(user);
-    //   const tokens = TokenService.generateTokens({...userDto});
-    //
-    //   await TokenService.saveToken(userDto.id, tokens.refreshToken);
-    //   return {
-    //     ...tokens,
-    //     user: userDto
-    //   }
-    // }
-
     async logout(refreshToken: string) {
         return await TokenService.removeToken(refreshToken);
     }
@@ -309,28 +234,6 @@ class UserService {
         await User.update(userData, {where: {id}})
         return userData;
     }
-
-    // async changeUsersEmail( {email, id}, next ) {
-    //   const candidateEmail = await User.findOne( { where: { email } } );
-    //   const user = await User.findOne({ where: { id } })
-    //
-    //   if (candidateEmail) {
-    //     return next(ApiError.badRequest('Пользователь с таким email уже существует.'))
-    //   }
-    //
-    //   const activationLink = await uuid.v4();
-    //
-    //   const userData = {
-    //     email,
-    //     activationLink,
-    //     isActivated: false
-    //   }
-    //
-    //   await User.update(userData, { where: { id } });
-    //
-    //   await MailService.sendActivationMail(email, `${process.env.API_URL}/api/user/activate/${activationLink}`);
-    //
-    // }
 }
 
 export default new UserService();

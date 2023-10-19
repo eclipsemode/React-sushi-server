@@ -29,8 +29,6 @@
     "express-validator": "^7.0.1",
     "greensms": "^1.9.1",
     "jsonwebtoken": "^9.0.0",
-    "nodemailer": "^6.9.1",
-    "nodemailer-express-handlebars": "^6.1.0",
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.31.0",

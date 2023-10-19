@@ -151,7 +151,7 @@ class OrderService {
     }
 
     async getAllByUserId(id: number, page: number, size: number) {
-        const orders = await Order.findAll({
+        const orders = await Order.findAndCountAll({
             limit: size || undefined,
             offset: (page - 1) * size || undefined,
             order: [
@@ -160,7 +160,8 @@ class OrderService {
             where: {
                 userId: id
             },
-            include: [{ model: OrderProduct, as: 'products' }]
+            include: [{ model: OrderProduct, as: 'products' }],
+            distinct: true
         });
         return orders;
     }
