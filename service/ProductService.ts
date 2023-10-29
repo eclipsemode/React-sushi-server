@@ -173,6 +173,7 @@ class ProductService {
         }
 
         const parsedData = products.reduce((previousValue: Product[], currentValue: any) => {
+            currentValue.sizes?.sort((a: ProductSize, b: ProductSize) => a.price - b.price);
             return [...previousValue, currentValue.sizes?.map((item: ProductSize) => {
                 return {
                     id: currentValue.id,
