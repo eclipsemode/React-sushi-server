@@ -48,6 +48,14 @@ class ProductService {
         const products = await Product.findAll({
             include: [{model: ProductSize, as: 'sizes'}],
         });
+
+        let maxValueOrder = 0;
+        products.forEach((product) => {
+            if (product.orderIndex > maxValueOrder) {
+                maxValueOrder = product.orderIndex
+            }
+        });
+
         let fileName = uuidv4() + ".jpg";
         await image.mv(path.resolve(__dirname, "..", "static", fileName));
         const product = await Product.create({
@@ -55,7 +63,7 @@ class ProductService {
             rating,
             description,
             image: fileName,
-            orderIndex: orderIndex ?? products.length + 1,
+            orderIndex: maxValueOrder + 1,
             type,
             categoryId
         })
