@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/React-sushi-server.iml" filepath="$PROJECT_DIR$/.idea/React-sushi-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/express-lime.iml" filepath="$PROJECT_DIR$/.idea/express-lime.iml" />
     </modules>
   </component>
 </project>

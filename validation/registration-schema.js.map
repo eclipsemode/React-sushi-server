@@ -1,0 +1,1 @@
+{"version":3,"file":"registration-schema.js","sourceRoot":"","sources":["registration-schema.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,mBAAmB,CAAC;AAC1C,MAAM,kBAAkB,GAAG;IACvB,KAAK,CAAC,KAAK,CAAC;SACP,OAAO,CAAC,iCAAiC,CAAC;SAC1C,WAAW,CAAC,6BAA6B,CAAC;CAClD,CAAA;AAED,eAAe,kBAAkB,CAAC"}
