@@ -4,6 +4,8 @@ class CategoryController {
         try {
             const { name } = req.body;
             const { image } = req.files;
+            if (!image)
+                return res.sendStatus(400);
             const category = await CategoryService.create(name, image);
             return res.json(category);
         }
@@ -31,10 +33,9 @@ class CategoryController {
     }
     async change(req, res, next) {
         try {
-            let image;
-            if (req.files && req.files.image) {
-                image = req.files.image;
-            }
+            const { image } = req.files;
+            if (!image)
+                return res.sendStatus(400);
             const { id, name } = req.body;
             const result = await CategoryService.change(id || 0, name, image);
             return res.json(result);

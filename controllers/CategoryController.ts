@@ -2,12 +2,14 @@ import {Response, Request, NextFunction} from "express";
 import CategoryService from "../service/CategoryService.js";
 import fileUpload, {FileArray} from "express-fileupload";
 import {Category} from "../models/models.js";
+import ApiError from '../error/ApiError.js';
 
 class CategoryController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
       const {name} = req.body as unknown as Category;
       const {image } = req.files as FileArray;
+      if (!image) return res.sendStatus(400);
       const category = await CategoryService.create(name, image as fileUpload.UploadedFile)
       return res.json(category);
     } catch (e) {
@@ -35,10 +37,8 @@ class CategoryController {
 
   async change(req: Request, res: Response, next: NextFunction) {
     try {
-      let image;
-      if (req.files && req.files.image) {
-        image = req.files.image
-      }
+      const {image } = req.files as FileArray;
+      if (!image) return res.sendStatus(400);
       const {id, name} = req.body as unknown as Category;
       const result = await CategoryService.change(id || 0, name, image as fileUpload.UploadedFile);
       return res.json(result);

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import router from './routes/index.js'
 import errorhandler from './middleware/ErrorHandlingMiddleware.js';
+import fileUpload from 'express-fileupload';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -15,6 +16,7 @@ app.use(cors({
     credentials: true,
     origin: process.env.CLIENT_URL
 }));
+app.use(fileUpload())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

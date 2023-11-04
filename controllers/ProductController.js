@@ -2,7 +2,10 @@ import ProductService from '../service/ProductService.js';
 class ProductController {
     async create(req, res, next) {
         try {
-            const product = await ProductService.create({ ...req.body, image: req.files?.image });
+            const { image } = req.files;
+            if (!image)
+                return res.sendStatus(400);
+            const product = await ProductService.create({ ...req.body, image });
             return res.json(product);
         }
         catch (error) {
@@ -30,7 +33,10 @@ class ProductController {
     }
     async change(req, res, next) {
         try {
-            const product = await ProductService.change({ ...req.body, image: req.files?.image });
+            const { image } = req.files;
+            if (!image)
+                return res.sendStatus(400);
+            const product = await ProductService.change({ ...req.body, image });
             return res.json(product);
         }
         catch (e) {

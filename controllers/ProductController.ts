@@ -1,11 +1,13 @@
-import fileUpload from "express-fileupload";
+import fileUpload, { FileArray } from 'express-fileupload';
 import ProductService, {IGetProducts} from '../service/ProductService.js';
 import {Response, Request, NextFunction} from "express";
 
 class ProductController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const product = await ProductService.create({...req.body, image: req.files?.image as fileUpload.UploadedFile})
+      const {image } = req.files as FileArray;
+      if (!image) return res.sendStatus(400);
+      const product = await ProductService.create({...req.body, image})
       return res.json(product);
     } catch (error) {
       next(error);
@@ -33,7 +35,9 @@ class ProductController {
 
   async change(req: Request, res: Response, next: NextFunction) {
     try {
-      const product = await ProductService.change({...req.body, image: req.files?.image as fileUpload.UploadedFile});
+      const {image } = req.files as FileArray;
+      if (!image) return res.sendStatus(400);
+      const product = await ProductService.change({...req.body, image});
       return res.json(product);
     } catch (e) {
       next(e);
