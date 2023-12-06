@@ -51,7 +51,7 @@ class UserService {
         }
 
         // @ts-ignore
-        const client = new GreenSMS({user: process.env.SMS_SERVICE_LOGIN, pass: process.env.SMS_SERVOCE_PASSWORD});
+        const client = new GreenSMS({user: process.env.SMS_SERVICE_LOGIN, pass: process.env.SMS_SERVICE_PASSWORD});
 
         const callVerificationParams = {
             to: parsedTel,

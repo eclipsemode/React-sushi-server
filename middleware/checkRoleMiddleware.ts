@@ -1,6 +1,5 @@
 import {Response, Request, NextFunction} from "express";
 import TokenService from '../service/TokenService.js';
-import RegistrationDto from '../dto/RegistrationDto.js'
 
 import ApiError from "../error/ApiError.js";
 import {UserType} from "../models/types.js";

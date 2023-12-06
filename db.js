@@ -6,7 +6,7 @@ const dbUser = process.env.DB_USER;
 const dbHost = process.env.DB_HOST;
 const dbDriver = process.env.DB_DRIVER;
 const dbPassword = process.env.DB_PASSWORD;
-const dbPort = Number(process.env.DB_PORT || 5433);
+const dbPort = Number(process.env.DB_PORT || 5432);
 export default new Sequelize(dbName, dbUser, dbPassword, {
     dialect: dbDriver,
     host: dbHost,

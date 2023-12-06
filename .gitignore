@@ -1,0 +1,8 @@
+.env
+.idea
+combined.log
+error.log
+config
+node_modules
+package-lock.json
+pnpm-lock.yaml
