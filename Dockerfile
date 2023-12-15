@@ -1,6 +1,7 @@
-FROM node:18-alpine
+FROM node:20-slim
+RUN corepack enable
 WORKDIR /app
 COPY . .
-RUN yarn install --production
-CMD ["yarn", "start"]
+RUN pnpm install
+CMD ["pnpm", "run", "start"]
 EXPOSE 5000

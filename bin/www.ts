@@ -13,7 +13,7 @@ import http from 'http';
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '5000');
+const port = normalizePort(process.env.SERVER_PORT || '5000');
 app.set('port', port);
 
 /**
@@ -30,6 +30,7 @@ const debugServer = debug('express-lime:server');
 server.listen(port);
 server.on('error', onError);
 server.on('listening', async () => {
+  console.log('Server was started successfully!')
   await sequelize.authenticate();
   await sequelize.sync();
   onListening();

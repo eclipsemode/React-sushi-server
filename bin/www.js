@@ -22,6 +22,7 @@ const debugServer = debug('express-lime:server');
 server.listen(port);
 server.on('error', onError);
 server.on('listening', async () => {
+    console.log('Server was started successfully!');
     await sequelize.authenticate();
     await sequelize.sync();
     onListening();
