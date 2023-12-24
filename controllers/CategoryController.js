@@ -33,11 +33,15 @@ class CategoryController {
     }
     async change(req, res, next) {
         try {
-            const { image } = req.files;
-            if (!image)
-                return res.sendStatus(400);
+            let uploadedImage;
+            if (req.files?.image) {
+                uploadedImage = req.files.image;
+            }
+            else {
+                uploadedImage = null;
+            }
             const { id, name } = req.body;
-            const result = await CategoryService.change(id || 0, name, image);
+            const result = await CategoryService.change(id, name, uploadedImage);
             return res.json(result);
         }
         catch (e) {

@@ -1,11 +1,11 @@
-import fileUpload from "express-fileupload";
+import {UploadedFile} from "express-fileupload";
 import sequelize from "../db.js";
 import {Category, Product} from '../models/models.js';
 import ApiError from '../error/ApiError.js'
 import FsService from "./FsService.js";
 
 class CategoryService {
-    async create(name: string, image: fileUpload.UploadedFile) {
+    async create(name: string, image: UploadedFile) {
         return sequelize.transaction(async (t) => {
             const allCategories = await Category.findAll();
             const fileName = await FsService.CreateImage(image, 'images/category')
@@ -68,7 +68,7 @@ class CategoryService {
                 ])
             }
 
-            await FsService.DeleteImage(foundCategory.image, 'static/images/category')
+            await FsService.DeleteImage(foundCategory.image, 'images/category')
 
             await Category.destroy({
                 where: {id},
@@ -78,7 +78,7 @@ class CategoryService {
         })
     }
 
-    async change(id: number, name: string, image: fileUpload.UploadedFile) {
+    async change(id: number, name: string | null, image: UploadedFile | null) {
         if (!id) {
             throw ApiError.badRequest('Введите "id" категории', [
                 {
@@ -87,16 +87,6 @@ class CategoryService {
                 }
             ])
         }
-
-        if (!name) {
-            throw ApiError.badRequest('Введите "name" категории', [
-                {
-                    name: 'change',
-                    description: 'Ошибка изменения категории'
-                }
-            ])
-        }
-
 
         const foundCategory = await Category.findOne({
             where: {
@@ -113,14 +103,21 @@ class CategoryService {
             ])
         }
 
-        foundCategory.name = name;
+        const imageBuf = foundCategory.image;
+        let imagePath;
         if (image) {
-            const fileName = await FsService.ChangeImage(foundCategory.image, image, 'static/images/category');
-            if (fileName) foundCategory.image = fileName;
+            imagePath = await FsService.ChangeImage(foundCategory.image, image, 'images/category');
         }
-        await foundCategory.save();
 
-        return await foundCategory;
+        return await Category.update({
+            name: name ?? foundCategory.name,
+            image: imagePath ?? imageBuf
+        }, {
+            where: {
+                id
+            },
+            returning: true
+        })
     }
 
     async changeOrder(data: Category[]) {

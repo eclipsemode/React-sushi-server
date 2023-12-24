@@ -57,7 +57,7 @@ class CategoryService {
                     }
                 ]);
             }
-            await FsService.DeleteImage(foundCategory.image, 'static/images/category');
+            await FsService.DeleteImage(foundCategory.image, 'images/category');
             await Category.destroy({
                 where: { id },
                 transaction: t
@@ -68,14 +68,6 @@ class CategoryService {
     async change(id, name, image) {
         if (!id) {
             throw ApiError.badRequest('Введите "id" категории', [
-                {
-                    name: 'change',
-                    description: 'Ошибка изменения категории'
-                }
-            ]);
-        }
-        if (!name) {
-            throw ApiError.badRequest('Введите "name" категории', [
                 {
                     name: 'change',
                     description: 'Ошибка изменения категории'
@@ -95,14 +87,20 @@ class CategoryService {
                 }
             ]);
         }
-        foundCategory.name = name;
+        const imageBuf = foundCategory.image;
+        let imagePath;
         if (image) {
-            const fileName = await FsService.ChangeImage(foundCategory.image, image, 'static/images/category');
-            if (fileName)
-                foundCategory.image = fileName;
+            imagePath = await FsService.ChangeImage(foundCategory.image, image, 'images/category');
         }
-        await foundCategory.save();
-        return await foundCategory;
+        return await Category.update({
+            name: name ?? foundCategory.name,
+            image: imagePath ?? imageBuf
+        }, {
+            where: {
+                id
+            },
+            returning: true
+        });
     }
     async changeOrder(data) {
         return sequelize.transaction(async (t) => {
