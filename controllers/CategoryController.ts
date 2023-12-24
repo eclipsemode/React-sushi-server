@@ -2,7 +2,6 @@ import {Response, Request, NextFunction} from "express";
 import CategoryService from "../service/CategoryService.js";
 import fileUpload, {FileArray} from "express-fileupload";
 import {Category} from "../models/models.js";
-import ApiError from '../error/ApiError.js';
 
 class CategoryController {
   async create(req: Request, res: Response, next: NextFunction) {

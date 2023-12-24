@@ -1,27 +1,27 @@
 import sequelize from '../db.js'
-import {CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from "sequelize";
+import {Association, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, ForeignKey, NonAttribute} from "sequelize";
 import {OrderStatusType, OrderType, PaymentType, ProductType, PromocodeType, UserType} from "./types.js";
 
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    declare id?: CreationOptional<number>;
-    declare email?: string;
-    declare dateOfBirth?: Date;
-    declare role?: UserType;
-    declare name?: string;
-    declare surname?: string;
+    declare id: CreationOptional<number>;
+    declare email: string | null;
+    declare dateOfBirth: Date | null;
+    declare role: UserType | null;
+    declare name: string | null;
+    declare surname: string | null;
     declare tel: string;
-    declare street?: string;
-    declare house?: number;
-    declare floor?: number;
-    declare entrance?: number;
-    declare room?: number;
-    declare isActivated?: boolean ;
-    declare bonus?: number;
+    declare street: string | null;
+    declare house: number | null;
+    declare floor: number | null;
+    declare entrance: number | null;
+    declare room: number | null;
+    declare isActivated: boolean | null;
+    declare bonus: number | null;
 }
 
 User.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     email: {type: DataTypes.STRING},
     dateOfBirth: {type: DataTypes.DATE},
     role: {type: DataTypes.ENUM, values: ['USER', 'ADMIN'], defaultValue: "USER"},
@@ -43,12 +43,12 @@ User.init({
 
 
 class Branch extends Model<InferAttributes<Branch>, InferCreationAttributes<Branch>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare name: string;
 }
 
 Branch.init({
-        id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+        id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
         name: {type: DataTypes.STRING, allowNull: false}
     },
     {
@@ -57,14 +57,15 @@ Branch.init({
     })
 
 class Bonus extends Model<InferAttributes<Bonus>, InferCreationAttributes<Bonus>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare score: number;
-    declare orderId?: number;
+    declare orderId: ForeignKey<Order['id']>;
 }
 
 Bonus.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     score: {type: DataTypes.INTEGER, defaultValue: 0},
+    orderId: {type: DataTypes.INTEGER}
 }, {
     sequelize,
     tableName: 'bonuses'
@@ -75,16 +76,16 @@ class Confirmation extends Model<InferAttributes<Confirmation>, InferCreationAtt
     declare requestId: string;
     declare code: number;
     declare expiresIn: Date;
-    declare used?: boolean;
-    declare userId?: number;
+    declare used: boolean | null;
+    declare userId: ForeignKey<User['id']>;
 }
 
 Confirmation.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     requestId: {type: DataTypes.STRING, allowNull: false},
     code: {type: DataTypes.INTEGER, allowNull: false},
     expiresIn: {type: DataTypes.DATE, allowNull: false},
-    used: {type: DataTypes.BOOLEAN, defaultValue: false},
+    used: {type: DataTypes.BOOLEAN, defaultValue: false}
 }, {
     timestamps: true,
     sequelize,
@@ -92,21 +93,22 @@ Confirmation.init({
 })
 
 class Token extends Model<InferAttributes<Token>, InferCreationAttributes<Token>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare refreshToken: string;
-    declare userId?: number;
+    declare userId: ForeignKey<User['id']>;
 }
 
 Token.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     refreshToken: {type: DataTypes.STRING},
+    userId: {type: DataTypes.INTEGER}
 }, {
     sequelize,
     tableName: 'tokens'
 })
 
 class Promocode extends Model<InferAttributes<Promocode>, InferCreationAttributes<Promocode>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare code: string;
     declare type: PromocodeType;
     declare discount: number;
@@ -114,7 +116,7 @@ class Promocode extends Model<InferAttributes<Promocode>, InferCreationAttribute
 }
 
 Promocode.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     code: {type: DataTypes.STRING, allowNull: false, unique: true},
     type: {type: DataTypes.ENUM, values: ['RUB', 'percent']},
     discount: {type: DataTypes.INTEGER, allowNull: false},
@@ -134,7 +136,7 @@ Promocode.init({
 })
 
 class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare orderId: number;
     declare totalPrice: number;
     declare totalAmount: number;
@@ -153,13 +155,13 @@ class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>
     declare commentary: string;
     declare promocode: string;
     declare status: OrderStatusType;
-    declare channel?: number;
-    declare userId?: number;
-    declare branchId?: number;
+    declare channel: number | null;
+    declare userId: ForeignKey<User['id']> | null;
+    declare branchId: ForeignKey<Branch['id']>;
 }
 
 Order.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     orderId: {type: DataTypes.INTEGER},
     totalPrice: {type: DataTypes.INTEGER, allowNull: false},
     totalAmount: {type: DataTypes.INTEGER, allowNull: false},
@@ -191,7 +193,7 @@ Order.init({
 })
 
 class OrderProduct extends Model<InferAttributes<OrderProduct>, InferCreationAttributes<OrderProduct>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare productId: number;
     declare name: string;
     declare rating: number;
@@ -204,11 +206,11 @@ class OrderProduct extends Model<InferAttributes<OrderProduct>, InferCreationAtt
     declare price: number;
     declare sku: string;
     declare amount: number;
-    declare orderId?: number;
+    declare orderId: ForeignKey<Order['id']>;
 }
 
 OrderProduct.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     productId: {type: DataTypes.INTEGER, allowNull: false},
     name: {type: DataTypes.STRING, allowNull: false, unique: false},
     rating: {type: DataTypes.INTEGER, defaultValue: 1},
@@ -228,7 +230,7 @@ OrderProduct.init({
 })
 
 class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare name: string;
     declare rating: number;
     declare description: string;
@@ -236,11 +238,15 @@ class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Pr
     declare orderIndex: number;
     declare type: ProductType;
     declare categoryId?: number;
-    declare sizes?: ProductSize[];
+    declare sizes?: NonAttribute<ProductSize[]>;
+
+    declare static associations: {
+        sizes: Association<Product, ProductSize>;
+    };
 }
 
 Product.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false, unique: false},
     rating: {type: DataTypes.INTEGER, defaultValue: 1},
     description: {type: DataTypes.STRING, allowNull: false},
@@ -253,15 +259,15 @@ Product.init({
 })
 
 class ProductSize extends Model<InferAttributes<ProductSize>, InferCreationAttributes<ProductSize>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare size: string;
     declare price: number;
     declare sku: string;
-    declare productId?: number;
+    declare productId: ForeignKey<Product['id']>;
 }
 
 ProductSize.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     size: {type: DataTypes.STRING},
     price: {type: DataTypes.INTEGER, allowNull: false},
     sku: {type: DataTypes.STRING, defaultValue: null, unique: true},
@@ -271,14 +277,14 @@ ProductSize.init({
 })
 
 class Category extends Model<InferAttributes<Category>, InferCreationAttributes<Category>> {
-    declare id?: CreationOptional<number>;
+    declare id: CreationOptional<number>;
     declare name: string;
     declare image: string;
     declare orderIndex: number;
 }
 
 Category.init({
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, unique: true, allowNull: false},
     image: {type: DataTypes.STRING},
     orderIndex: {type: DataTypes.INTEGER, allowNull: false}

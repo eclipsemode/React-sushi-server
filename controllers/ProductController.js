@@ -33,9 +33,13 @@ class ProductController {
     }
     async change(req, res, next) {
         try {
-            const { image } = req.files;
-            if (!image)
-                return res.sendStatus(400);
+            let image;
+            if (req.files?.image) {
+                image = req.files;
+            }
+            else {
+                image = null;
+            }
             const product = await ProductService.change({ ...req.body, image });
             return res.json(product);
         }

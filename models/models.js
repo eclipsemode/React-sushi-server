@@ -3,7 +3,7 @@ import { DataTypes, Model } from "sequelize";
 class User extends Model {
 }
 User.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     email: { type: DataTypes.STRING },
     dateOfBirth: { type: DataTypes.DATE },
     role: { type: DataTypes.ENUM, values: ['USER', 'ADMIN'], defaultValue: "USER" },
@@ -25,7 +25,7 @@ User.init({
 class Branch extends Model {
 }
 Branch.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false }
 }, {
     sequelize,
@@ -34,8 +34,9 @@ Branch.init({
 class Bonus extends Model {
 }
 Bonus.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     score: { type: DataTypes.INTEGER, defaultValue: 0 },
+    orderId: { type: DataTypes.INTEGER }
 }, {
     sequelize,
     tableName: 'bonuses'
@@ -43,11 +44,11 @@ Bonus.init({
 class Confirmation extends Model {
 }
 Confirmation.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     requestId: { type: DataTypes.STRING, allowNull: false },
     code: { type: DataTypes.INTEGER, allowNull: false },
     expiresIn: { type: DataTypes.DATE, allowNull: false },
-    used: { type: DataTypes.BOOLEAN, defaultValue: false },
+    used: { type: DataTypes.BOOLEAN, defaultValue: false }
 }, {
     timestamps: true,
     sequelize,
@@ -56,8 +57,9 @@ Confirmation.init({
 class Token extends Model {
 }
 Token.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     refreshToken: { type: DataTypes.STRING },
+    userId: { type: DataTypes.INTEGER }
 }, {
     sequelize,
     tableName: 'tokens'
@@ -65,7 +67,7 @@ Token.init({
 class Promocode extends Model {
 }
 Promocode.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     code: { type: DataTypes.STRING, allowNull: false, unique: true },
     type: { type: DataTypes.ENUM, values: ['RUB', 'percent'] },
     discount: { type: DataTypes.INTEGER, allowNull: false },
@@ -86,7 +88,7 @@ Promocode.init({
 class Order extends Model {
 }
 Order.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     orderId: { type: DataTypes.INTEGER },
     totalPrice: { type: DataTypes.INTEGER, allowNull: false },
     totalAmount: { type: DataTypes.INTEGER, allowNull: false },
@@ -119,7 +121,7 @@ Order.init({
 class OrderProduct extends Model {
 }
 OrderProduct.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     productId: { type: DataTypes.INTEGER, allowNull: false },
     name: { type: DataTypes.STRING, allowNull: false, unique: false },
     rating: { type: DataTypes.INTEGER, defaultValue: 1 },
@@ -140,7 +142,7 @@ OrderProduct.init({
 class Product extends Model {
 }
 Product.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, allowNull: false, unique: false },
     rating: { type: DataTypes.INTEGER, defaultValue: 1 },
     description: { type: DataTypes.STRING, allowNull: false },
@@ -154,7 +156,7 @@ Product.init({
 class ProductSize extends Model {
 }
 ProductSize.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     size: { type: DataTypes.STRING },
     price: { type: DataTypes.INTEGER, allowNull: false },
     sku: { type: DataTypes.STRING, defaultValue: null, unique: true },
@@ -165,7 +167,7 @@ ProductSize.init({
 class Category extends Model {
 }
 Category.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, unique: true, allowNull: false },
     image: { type: DataTypes.STRING },
     orderIndex: { type: DataTypes.INTEGER, allowNull: false }

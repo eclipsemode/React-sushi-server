@@ -200,7 +200,7 @@ class OrderService {
 
         const user = await User.findOne({
             where: {
-                id: order.userId
+                id: order.userId || 0
             }
         })
 

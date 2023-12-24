@@ -1,153 +1,151 @@
 import fileUpload from "express-fileupload";
+import sequelize from "../db.js";
 import {Category, Product} from '../models/models.js';
-import { v4 as uuidv4 } from 'uuid';
-import path from "path";
 import ApiError from '../error/ApiError.js'
-import fs from 'fs-extra'
-
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
+import FsService from "./FsService.js";
 
 class CategoryService {
-  async create(name: string, image: fileUpload.UploadedFile) {
-    const allCategories = await Category.findAll();
-    let fileName = uuidv4() + ".jpg";
-    await image.mv(path.resolve(__dirname, "..", "static/images/category", fileName));
-    const category = await Category.create({name, image: fileName, orderIndex: allCategories.length + 1});
-    return category;
-  }
+    async create(name: string, image: fileUpload.UploadedFile) {
+        return sequelize.transaction(async (t) => {
+            const allCategories = await Category.findAll();
+            const fileName = await FsService.CreateImage(image, 'static/images/category')
+            const category = await Category.create({
+                name,
+                image: fileName,
+                orderIndex: allCategories.length + 1
+            }, {transaction: t});
+            return category;
+        })
+    }
 
-  async getAll() {
-    const categories = await Category.findAll({
-      order: [
-        ['orderIndex', 'asc']
-      ]
-    });
-    return categories;
-  }
+    async getAll() {
+        const categories = await Category.findAll({
+            order: [
+                ['orderIndex', 'asc']
+            ]
+        });
+        return categories;
+    }
 
-  async delete(id: number) {
+    async delete(id: number) {
+        return sequelize.transaction(async (t) => {
+            if (!id) {
+                throw ApiError.badRequest('Введите "id" категории', [
+                    {
+                        name: 'delete',
+                        description: 'Ошибка удаления категории'
+                    }
+                ])
+            }
 
-    if (!id) {
-      throw ApiError.badRequest('Введите "id" категории', [
-        {
-          name: 'delete',
-          description: 'Ошибка удаления категории'
+            const foundProductsInCategory = await Product.findOne({
+                where: {
+                    categoryId: id
+                }
+            })
+
+            if (foundProductsInCategory) {
+                throw ApiError.badRequest('В категории присутствуют товары, удаление невозможно', [
+                    {
+                        name: 'delete',
+                        description: 'Ошибка удаления категории'
+                    }
+                ])
+            }
+
+
+            const foundCategory = await Category.findOne({
+                where: {id}
+            })
+
+
+            if (!foundCategory) {
+                throw ApiError.badRequest('Категория не найдена', [
+                    {
+                        name: 'delete',
+                        description: 'Ошибка удаления категории'
+                    }
+                ])
+            }
+
+            await FsService.DeleteImage(foundCategory.image, 'static/images/category')
+
+            await Category.destroy({
+                where: {id},
+                transaction: t
+            })
+            return 'Deleted successfully';
+        })
+    }
+
+    async change(id: number, name: string, image: fileUpload.UploadedFile) {
+        if (!id) {
+            throw ApiError.badRequest('Введите "id" категории', [
+                {
+                    name: 'change',
+                    description: 'Ошибка изменения категории'
+                }
+            ])
         }
-      ])
-    }
 
-    const foundProductsInCategory = await Product.findOne({
-      where: {
-        categoryId: id
-      }
-    })
-
-    if (foundProductsInCategory) {
-      throw ApiError.badRequest('В категории присутствуют товары, удаление невозможно', [
-        {
-          name: 'delete',
-          description: 'Ошибка удаления категории'
+        if (!name) {
+            throw ApiError.badRequest('Введите "name" категории', [
+                {
+                    name: 'change',
+                    description: 'Ошибка изменения категории'
+                }
+            ])
         }
-      ])
-    }
 
 
-    const foundCategory = await Category.findOne({
-      where: {id}
-    })
+        const foundCategory = await Category.findOne({
+            where: {
+                id
+            }
+        })
 
-
-    if (!foundCategory) {
-      throw ApiError.badRequest('Категория не найдена', [
-        {
-          name: 'delete',
-          description: 'Ошибка удаления категории'
+        if (!foundCategory) {
+            throw ApiError.badRequest('Категория не найдена', [
+                {
+                    name: 'change',
+                    description: 'Ошибка изменения категории'
+                }
+            ])
         }
-      ])
-    }
 
-    const imagePath = path.join(__dirname, '..', 'static/images/category', foundCategory.image);
-    await fs.remove(imagePath);
-
-    await Category.destroy({
-      where: { id }
-    })
-    return 'Deleted successfully';
-  }
-
-  async change(id: number, name: string, image: fileUpload.UploadedFile){
-    if (!id) {
-      throw ApiError.badRequest('Введите "id" категории', [
-        {
-          name: 'change',
-          description: 'Ошибка изменения категории'
+        foundCategory.name = name;
+        if (image) {
+            const fileName = await FsService.ChangeImage(foundCategory.image, image, 'static/images/category');
+            if (fileName) foundCategory.image = fileName;
         }
-      ])
+        await foundCategory.save();
+
+        return await foundCategory;
     }
 
-    if (!name) {
-      throw ApiError.badRequest('Введите "name" категории', [
-        {
-          name: 'change',
-          description: 'Ошибка изменения категории'
-        }
-      ])
+    async changeOrder(data: Category[]) {
+        return sequelize.transaction(async (t) => {
+            if (!data) {
+                throw ApiError.badRequest('Отсутствует массив категорий', [
+                    {
+                        name: 'changeOrder',
+                        description: 'Ошибка изменения порядка категории'
+                    }
+                ])
+            }
+
+            const categoryPromises = data.map(async (item, index) => {
+                return await Category.update({orderIndex: index + 1}, {
+                    where: {id: item.id},
+                    transaction: t
+                })
+            })
+
+            await Promise.all(categoryPromises);
+
+            return 'Successfully changed';
+        })
     }
-
-
-    const foundCategory = await Category.findOne({
-      where: {
-        id
-      }
-    })
-
-    if (!foundCategory) {
-      throw ApiError.badRequest('Категория не найдена', [
-        {
-          name: 'change',
-          description: 'Ошибка изменения категории'
-        }
-      ])
-    }
-
-    foundCategory.name = name;
-    if (image) {
-      const fileName = uuidv4() + ".jpg";
-      await image.mv(path.resolve(__dirname, "..", "static/images/category", fileName));
-      if (foundCategory.image) {
-        fs.remove(path.resolve(__dirname, "..", "static/images/category", foundCategory.image))
-      }
-      foundCategory.image = fileName;
-    }
-    await foundCategory.save();
-
-    return await foundCategory;
-  }
-
-  async changeOrder(data: Category[]) {
-    if (!data) {
-      throw ApiError.badRequest('Отсутствует массив категорий', [
-        {
-          name: 'changeOrder',
-          description: 'Ошибка изменения порядка категории'
-        }
-      ])
-    }
-
-    const categoryPromises = data.map(async (item, index) => {
-      return await Category.update({orderIndex: index + 1}, {
-        where: {id: item.id}
-      })
-    })
-
-    await Promise.all(categoryPromises);
-
-    return 'Successfully changed';
-  }
 }
 
 export default new CategoryService()

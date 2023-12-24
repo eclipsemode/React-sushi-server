@@ -118,7 +118,7 @@ class UserService {
         }
         const foundUser = await User.findOne({
             where: {
-                id: foundConfirmation.userId
+                id: foundConfirmation.userId || 0
             }
         });
         if (foundUser && !foundUser.isActivated) {
@@ -158,13 +158,13 @@ class UserService {
         const { userId } = await TokenService.findToken(token);
         const user = await User.findOne({ where: { id: userId } });
         if (user) {
-            user.dateOfBirth = !!user.dateOfBirth ? user.dateOfBirth : undefined;
-            user.surname = !!user.surname ? user.surname : undefined;
-            user.street = !!user.street ? user.street : undefined;
-            user.house = !!user.house ? user.house : undefined;
-            user.floor = !!user.floor ? user.floor : undefined;
-            user.entrance = !!user.entrance ? user.entrance : undefined;
-            user.room = !!user.room ? user.room : undefined;
+            user.dateOfBirth = !!user.dateOfBirth ? user.dateOfBirth : null;
+            user.surname = !!user.surname ? user.surname : null;
+            user.street = !!user.street ? user.street : null;
+            user.house = !!user.house ? user.house : null;
+            user.floor = !!user.floor ? user.floor : null;
+            user.entrance = !!user.entrance ? user.entrance : null;
+            user.room = !!user.room ? user.room : null;
         }
         return user;
     }
