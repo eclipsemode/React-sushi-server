@@ -1,6 +1,6 @@
 import {Response, Request, NextFunction} from "express";
 import CategoryService from "../service/CategoryService.js";
-import fileUpload, {FileArray} from "express-fileupload";
+import fileUpload, {FileArray, UploadedFile} from "express-fileupload";
 import {Category} from "../models/models.js";
 
 class CategoryController {
@@ -9,7 +9,7 @@ class CategoryController {
       const {name} = req.body as unknown as Category;
       const {image } = req.files as FileArray;
       if (!image) return res.sendStatus(400);
-      const category = await CategoryService.create(name, image as fileUpload.UploadedFile)
+      const category = await CategoryService.create(name, image as UploadedFile)
       return res.json(category);
     } catch (e) {
       next(e);

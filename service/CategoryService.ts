@@ -8,7 +8,7 @@ class CategoryService {
     async create(name: string, image: fileUpload.UploadedFile) {
         return sequelize.transaction(async (t) => {
             const allCategories = await Category.findAll();
-            const fileName = await FsService.CreateImage(image, 'static/images/category')
+            const fileName = await FsService.CreateImage(image, 'images/category')
             const category = await Category.create({
                 name,
                 image: fileName,
